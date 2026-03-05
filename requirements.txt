@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+pydantic
+requests
+python-dotenv
+pytest
+httpx
+python-telegram-bot
+reportlab

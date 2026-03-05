@@ -1,0 +1,17 @@
+.env
+__pycache__/
+venv/
+*.pyc
+
+# Internal planning/docs - not needed on GitHub
+FEATURE_DEVELOPMENT_CHECKLIST.md
+IMPLEMENTATION_SUMMARY.md
+PRIORITY_IMPLEMENTATION_COMPLETE.md
+RTIAssist_Execution_Plan.md
+TELEGRAM_BOT_UPDATES.md
+QUICK_START.md
+
+# Root-level test scripts (tests/ folder is kept)
+test_bot_features.py
+test_features.py
+

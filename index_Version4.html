@@ -1,0 +1,2846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RTIAssist — India's Most Powerful Free RTI Tool</title>
+<meta name="description" content="AI-powered RTI application generator. 11 languages, all 28 states. Tracker, appeal generator, fee calculator. 100% free."/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{
+  --saffron:#FF6B00;--saffron-l:#FF8C3A;
+  --green:#006B3F;--green-l:#00A86B;
+  --navy:#0A1628;--navy-mid:#112240;
+  --gold:#D4A017;--text:#E8E8E8;--muted:#8892A4;
+  --border:rgba(255,255,255,0.08);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--navy);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 20% 10%,rgba(255,107,0,.08) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 80%,rgba(0,107,63,.08) 0%,transparent 60%);pointer-events:none;z-index:0;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1rem 3rem;background:rgba(10,22,40,.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,107,0,.15);}
+.logo{display:flex;align-items:center;gap:.75rem;font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:900;color:white;cursor:pointer;}
+.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--saffron),var(--gold));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;}
+.logo span{color:var(--saffron);}
+.nav-buttons{display:flex;gap:.25rem;}
+.nav-btn{background:transparent;border:none;color:var(--muted);padding:.45rem .9rem;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:500;cursor:pointer;transition:all .2s;}
+.nav-btn:hover,.nav-btn.active{background:rgba(255,107,0,.08);color:var(--saffron-l);}
+
+/* PAGES */
+.page{display:none;position:relative;z-index:1;}
+.page.active{display:block;}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:7rem 2rem 4rem;}
+.hero-tag{display:inline-flex;align-items:center;gap:.5rem;background:rgba(0,107,63,.15);border:1px solid rgba(0,107,63,.4);color:var(--green-l);padding:.4rem 1rem;border-radius:20px;font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:1.5rem;animation:fadeUp .5s ease both;}
+.hero-tag::before{content:'●';font-size:.4rem;animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+h1{font-family:'Playfair Display',serif;font-size:clamp(2.5rem,6vw,5rem);font-weight:900;line-height:1.1;margin-bottom:1.5rem;animation:fadeUp .5s .1s ease both;}
+h1 .org{color:var(--saffron);}
+h1 .teal{color:var(--green-l);}
+.hero-sub{font-size:1.1rem;color:var(--muted);max-width:560px;line-height:1.7;margin-bottom:2rem;animation:fadeUp .5s .15s ease both;}
+.lang-pills{display:flex;flex-wrap:wrap;gap:.45rem;justify-content:center;margin-bottom:2.5rem;animation:fadeUp .5s .2s ease both;}
+.lang-pill{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:20px;padding:.25rem .7rem;font-size:.75rem;color:var(--muted);}
+.stats-row{display:flex;gap:3rem;justify-content:center;margin-bottom:3rem;animation:fadeUp .5s .25s ease both;}
+.stat{text-align:center;}
+.stat-num{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:var(--saffron);}
+.stat-label{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;}
+.feature-chips{display:flex;flex-wrap:wrap;gap:.4rem;justify-content:center;margin-bottom:2.5rem;animation:fadeUp .5s .3s ease both;}
+.fchip{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:20px;padding:.25rem .75rem;font-size:.73rem;color:var(--muted);}
+.fchip b{color:var(--saffron-l);}
+
+/* MAIN CARD */
+.main-card{width:100%;max-width:800px;margin:0 auto;background:rgba(17,34,64,.85);border:1px solid rgba(255,107,0,.2);border-radius:24px;padding:2.5rem;backdrop-filter:blur(20px);box-shadow:0 40px 80px rgba(0,0,0,.4);animation:fadeUp .5s .35s ease both;}
+.card-header{display:flex;align-items:center;gap:1rem;margin-bottom:1.8rem;padding-bottom:1.4rem;border-bottom:1px solid rgba(255,255,255,.05);}
+.step-indicator{display:flex;gap:.4rem;}
+.step{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.12);transition:all .3s;}
+.step.active{background:var(--saffron);width:24px;border-radius:4px;}
+.step.done{background:var(--green-l);}
+.card-title{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;}
+
+/* LANG SELECTOR */
+.lang-btns{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.3rem;}
+.lbtn{background:rgba(255,255,255,.03);border:1.5px solid var(--border);border-radius:8px;padding:.3rem .7rem;font-size:.77rem;color:var(--muted);cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;}
+.lbtn:hover{border-color:rgba(255,107,0,.3);color:var(--saffron-l);}
+.lbtn.sel{background:rgba(255,107,0,.1);border-color:var(--saffron);color:var(--saffron-l);}
+
+label{display:block;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-bottom:.5rem;}
+textarea,select,input[type=text],input[type=date]{width:100%;background:rgba(255,255,255,.04);border:1.5px solid var(--border);border-radius:12px;padding:.9rem 1.1rem;color:white;font-family:'DM Sans',sans-serif;font-size:.92rem;transition:all .2s;outline:none;}
+textarea{min-height:115px;resize:vertical;line-height:1.65;}
+textarea:focus,select:focus,input:focus{border-color:var(--saffron);background:rgba(255,107,0,.04);box-shadow:0 0 0 3px rgba(255,107,0,.08);}
+textarea::placeholder,input::placeholder{color:rgba(255,255,255,.2);}
+select option{background:var(--navy-mid);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.form-group{margin-bottom:1.2rem;}
+
+/* EXAMPLES */
+.ex-lbl{font-size:.72rem;color:var(--muted);margin-bottom:.45rem;display:block;}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.3rem;}
+.chip{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:20px;padding:.26rem .75rem;font-size:.74rem;color:var(--muted);cursor:pointer;transition:all .15s;}
+.chip:hover{background:rgba(255,107,0,.08);border-color:rgba(255,107,0,.2);color:var(--saffron-l);}
+
+/* SUBMIT */
+.submit-btn{width:100%;padding:1.05rem;background:linear-gradient(135deg,#FF6B00,#FF8C3A);border:none;border-radius:12px;color:white;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:.6rem;}
+.submit-btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(255,107,0,.3);}
+.submit-btn:disabled{opacity:.55;cursor:not-allowed;transform:none;}
+.spinner{width:17px;height:17px;border:2.5px solid rgba(255,255,255,.25);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;display:none;}
+.submit-btn.loading .spinner{display:block;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err-box{display:none;background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.2);border-radius:10px;padding:.85rem 1.1rem;font-size:.83rem;color:#FCA5A5;margin-top:1rem;}
+.err-box.show{display:block;}
+
+/* RESULT */
+.result{display:none;margin-top:2rem;animation:fadeUp .35s ease both;}
+.result.show{display:block;}
+.res-header{display:flex;align-items:flex-start;justify-content:space-between;background:rgba(0,107,63,.08);border:1px solid rgba(0,107,63,.2);border-radius:14px;padding:1.1rem 1.3rem;margin-bottom:1.1rem;gap:1rem;}
+.res-title{font-weight:700;font-size:.95rem;margin-bottom:.25rem;}
+.res-meta{font-size:.78rem;color:var(--muted);line-height:1.6;}
+.res-meta strong{color:var(--text);}
+
+/* PORTAL LINK */
+.portal-link{display:flex;align-items:center;gap:.75rem;background:rgba(212,160,23,.06);border:1px solid rgba(212,160,23,.2);border-radius:12px;padding:.85rem 1.1rem;margin-bottom:1.1rem;text-decoration:none;transition:all .2s;}
+.portal-link:hover{background:rgba(212,160,23,.1);}
+.portal-text strong{color:var(--gold);display:block;font-size:.83rem;}
+.portal-text span{font-size:.75rem;color:var(--muted);}
+.portal-arrow{margin-left:auto;color:var(--gold);}
+
+/* TAGS */
+.tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.1rem;}
+.tag{padding:.25rem .7rem;border-radius:20px;font-size:.71rem;font-weight:500;}
+.tag-o{background:rgba(255,107,0,.1);border:1px solid rgba(255,107,0,.2);color:var(--saffron-l);}
+.tag-g{background:rgba(0,168,107,.1);border:1px solid rgba(0,168,107,.2);color:var(--green-l);}
+.tag-y{background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.2);color:var(--gold);}
+.tag-b{background:rgba(100,149,237,.1);border:1px solid rgba(100,149,237,.2);color:cornflowerblue;}
+
+/* SCORES */
+.scores{display:grid;grid-template-columns:repeat(3,1fr);gap:.85rem;margin-bottom:1.1rem;}
+.score-card{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:12px;padding:.9rem;text-align:center;}
+.score-val{font-family:'Playfair Display',serif;font-size:1.55rem;font-weight:700;line-height:1;margin-bottom:.25rem;}
+.score-val.high{color:var(--green-l);}
+.score-val.medium{color:var(--gold);}
+.score-val.low{color:#F87171;}
+.score-lbl{font-size:.63rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);}
+
+/* DEADLINE BOX */
+.deadline-box{background:rgba(212,160,23,.05);border:1px solid rgba(212,160,23,.2);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1rem;}
+.deadline-title{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:.75rem;}
+.deadline-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;}
+.dl-item{text-align:center;}
+.dl-num{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;color:var(--gold);line-height:1;}
+.dl-sub{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-top:.2rem;}
+.dl-date{font-size:.73rem;color:rgba(255,255,255,.5);}
+.countdown{display:flex;gap:.35rem;align-items:center;justify-content:center;margin-top:.4rem;}
+.cd-box{background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.2);border-radius:5px;padding:.25rem .5rem;font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--gold);min-width:30px;text-align:center;}
+.cd-sep{color:var(--gold);font-weight:700;font-size:.75rem;}
+.btn-save-tracker{margin-top:.65rem;background:rgba(212,160,23,.08);border:1px solid rgba(212,160,23,.2);color:var(--gold);padding:.4rem .9rem;border-radius:8px;font-size:.75rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;}
+.btn-save-tracker:hover{background:rgba(212,160,23,.15);}
+
+/* DRAFT BOX */
+.draft-box{background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:1rem;}
+.draft-header{display:flex;align-items:center;justify-content:space-between;padding:.65rem 1.1rem;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border);}
+.draft-header span{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);}
+.draft-actions{display:flex;gap:.45rem;}
+.copy-btn,.wa-btn{border:1px solid;padding:.26rem .7rem;border-radius:6px;font-size:.71rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.copy-btn{background:rgba(255,107,0,.08);border-color:rgba(255,107,0,.2);color:var(--saffron-l);}
+.copy-btn:hover{background:rgba(255,107,0,.15);}
+.wa-btn{background:rgba(37,211,102,.08);border-color:rgba(37,211,102,.2);color:#25D366;}
+.wa-btn:hover{background:rgba(37,211,102,.15);}
+.draft-content{padding:1.3rem;font-family:'JetBrains Mono',monospace;font-size:.75rem;line-height:1.9;color:rgba(255,255,255,.7);white-space:pre-wrap;max-height:340px;overflow-y:auto;text-align:left;}
+.draft-content::-webkit-scrollbar{width:3px;}
+.draft-content::-webkit-scrollbar-thumb{background:rgba(255,107,0,.25);border-radius:2px;}
+
+/* WARNINGS */
+.warn-box{background:rgba(212,160,23,.05);border:1px solid rgba(212,160,23,.18);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1rem;}
+.warn-title{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:.65rem;}
+.warn-item{font-size:.79rem;color:rgba(255,255,255,.55);padding:.28rem 0 .28rem .85rem;border-left:2px solid rgba(212,160,23,.25);margin-bottom:.3rem;line-height:1.5;text-align:left;}
+
+/* INSTRUCTIONS */
+.inst-box{background:rgba(0,107,63,.05);border:1px solid rgba(0,107,63,.18);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.1rem;}
+.inst-title{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--green-l);margin-bottom:.65rem;}
+.inst-content{font-size:.79rem;color:rgba(255,255,255,.55);line-height:1.75;white-space:pre-wrap;text-align:left;}
+
+/* APPEAL BUTTON */
+.btn-appeal{width:100%;padding:.9rem;background:linear-gradient(135deg,#6B21A8,#9333EA);border:none;border-radius:12px;color:white;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;margin-bottom:.85rem;display:flex;align-items:center;justify-content:center;gap:.5rem;}
+.btn-appeal:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(107,33,168,.3);}
+
+/* ACTION BTNS */
+.action-btns{display:grid;grid-template-columns:1fr 1fr;gap:.85rem;}
+.action-btn{padding:.82rem;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.87rem;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:.45rem;border:none;}
+.btn-download{background:linear-gradient(135deg,var(--green),var(--green-l));color:white;}
+.btn-download:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(0,107,63,.3);}
+.btn-new{background:transparent;border:1.5px solid var(--border)!important;color:var(--muted);}
+.btn-new:hover{border-color:rgba(255,107,0,.3)!important;color:var(--saffron-l);}
+
+/* APPEAL MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:200;align-items:center;justify-content:center;padding:1rem;}
+.modal-overlay.show{display:flex;}
+.modal-box{background:var(--navy-mid);border:1px solid rgba(107,33,168,.3);border-radius:20px;padding:2rem;max-width:720px;width:100%;max-height:90vh;overflow-y:auto;}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;}
+.modal-ttl{font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:700;}
+.modal-close{background:rgba(255,255,255,.08);border:none;color:white;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:.95rem;display:flex;align-items:center;justify-content:center;}
+.modal-desc{font-size:.82rem;color:var(--muted);margin-bottom:1rem;line-height:1.6;}
+.modal-draft{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:12px;padding:1.2rem;font-family:'JetBrains Mono',monospace;font-size:.73rem;line-height:1.85;color:rgba(255,255,255,.7);white-space:pre-wrap;max-height:280px;overflow-y:auto;margin-bottom:1rem;}
+.modal-btns{display:flex;gap:.8rem;}
+.mbtn{flex:1;padding:.82rem;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.87rem;font-weight:600;cursor:pointer;border:none;display:flex;align-items:center;justify-content:center;gap:.4rem;}
+.mbtn-copy{background:rgba(107,33,168,.15);border:1px solid rgba(107,33,168,.3)!important;color:#C084FC;}
+.mbtn-dl{background:linear-gradient(135deg,#6B21A8,#9333EA);color:white;}
+
+/* HOW IT WORKS */
+.how-section{position:relative;z-index:1;padding:5rem 2rem;max-width:900px;margin:0 auto;}
+.section-label{text-align:center;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:var(--saffron);margin-bottom:.75rem;}
+.section-title{text-align:center;font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:700;margin-bottom:3rem;}
+.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;position:relative;}
+.steps-grid::before{content:'';position:absolute;top:28px;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,107,0,.3),rgba(0,107,63,.3),transparent);}
+.step-card{text-align:center;}
+.step-num{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;margin:0 auto 1rem;position:relative;z-index:1;}
+.step-card:nth-child(1) .step-num{background:rgba(255,107,0,.15);border:2px solid rgba(255,107,0,.4);color:var(--saffron);}
+.step-card:nth-child(2) .step-num{background:rgba(212,160,23,.15);border:2px solid rgba(212,160,23,.4);color:var(--gold);}
+.step-card:nth-child(3) .step-num{background:rgba(0,168,107,.15);border:2px solid rgba(0,168,107,.4);color:var(--green-l);}
+.step-card:nth-child(4) .step-num{background:rgba(100,149,237,.15);border:2px solid rgba(100,149,237,.4);color:cornflowerblue;}
+.step-card h3{font-size:.88rem;font-weight:700;margin-bottom:.45rem;}
+.step-card p{font-size:.75rem;color:var(--muted);line-height:1.55;}
+
+/* LANGS */
+.langs-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:.85rem;}
+.lang-card{background:rgba(14,31,58,.6);border:1px solid var(--border);border-radius:12px;padding:.9rem;text-align:center;transition:all .2s;}
+.lang-card:hover{border-color:rgba(255,107,0,.2);}
+.lang-native{font-size:1.05rem;font-weight:600;margin-bottom:.18rem;}
+.lang-eng{font-size:.68rem;color:var(--muted);}
+
+/* INNER PAGES */
+.page-container{max-width:960px;margin:0 auto;padding:7.5rem 2rem 4rem;}
+.page-title{font-family:'Playfair Display',serif;font-size:2.3rem;font-weight:700;margin-bottom:.4rem;}
+.page-sub{color:var(--muted);font-size:.95rem;margin-bottom:2rem;line-height:1.6;}
+
+/* TRACKER */
+.tracker-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;}
+.tstat{background:rgba(14,31,58,.8);border:1px solid var(--border);border-radius:12px;padding:1rem;text-align:center;}
+.tstat-n{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;line-height:1;}
+.tstat-l{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:.25rem;}
+.search-bar{display:flex;gap:.75rem;margin-bottom:1rem;}
+.search-bar input{flex:1;}
+.filter-row{display:flex;gap:.45rem;margin-bottom:1.2rem;flex-wrap:wrap;}
+.filter-btn{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:20px;padding:.28rem .8rem;font-size:.75rem;color:var(--muted);cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;}
+.filter-btn:hover,.filter-btn.active{background:rgba(255,107,0,.08);border-color:rgba(255,107,0,.2);color:var(--saffron-l);}
+.rti-card{background:rgba(14,31,58,.8);border:1px solid var(--border);border-radius:14px;padding:1.1rem 1.2rem;margin-bottom:.85rem;cursor:pointer;transition:all .2s;}
+.rti-card:hover{border-color:rgba(255,107,0,.2);background:rgba(255,107,0,.03);}
+.rti-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:.5rem;}
+.rti-dept{font-weight:700;font-size:.92rem;color:var(--saffron-l);}
+.rti-desc{font-size:.77rem;color:var(--muted);line-height:1.4;margin-top:.2rem;}
+.rti-meta{display:flex;gap:1rem;font-size:.72rem;color:var(--muted);}
+.rti-overdue{font-size:.72rem;color:#F87171;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:6px;padding:.2rem .6rem;display:inline-block;margin-top:.4rem;}
+.status-badge{padding:.2rem .65rem;border-radius:20px;font-size:.68rem;font-weight:600;flex-shrink:0;}
+.empty-state{text-align:center;padding:3.5rem 1rem;color:var(--muted);}
+.empty-icon{font-size:2.5rem;margin-bottom:.75rem;}
+.export-btn{background:rgba(0,107,63,.1);border:1px solid rgba(0,107,63,.25);color:var(--green-l);padding:.75rem 1.5rem;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;margin-top:1rem;}
+
+/* RTI DETAIL MODAL */
+.rti-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:200;align-items:flex-start;justify-content:center;padding:5rem 1rem 1rem;overflow-y:auto;}
+.rti-modal.visible{display:flex;}
+.rti-modal-box{background:var(--navy-mid);border:1px solid rgba(255,107,0,.2);border-radius:20px;padding:2rem;max-width:680px;width:100%;}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;}
+.modal-title{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;}
+.modal-close-btn{background:rgba(255,255,255,.08);border:none;color:white;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:.95rem;}
+.modal-label{color:var(--muted);font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem;}
+.modal-section{margin-bottom:1.3rem;}
+
+/* FEES */
+.bpl-notice{background:rgba(0,107,63,.08);border:1px solid rgba(0,107,63,.2);border-radius:12px;padding:.9rem 1.1rem;margin-bottom:1.5rem;font-size:.83rem;color:var(--green-l);}
+.fees-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;}
+.fee-card{background:rgba(14,31,58,.8);border:1px solid var(--border);border-radius:14px;padding:1.1rem;transition:all .2s;}
+.fee-card:hover{border-color:rgba(255,107,0,.2);}
+.fee-state{font-weight:700;font-size:.93rem;margin-bottom:.3rem;}
+.fee-amt{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--saffron);line-height:1;margin-bottom:.35rem;}
+.fee-info{font-size:.71rem;color:var(--muted);line-height:1.55;}
+.fee-portal{display:inline-block;margin-top:.45rem;font-size:.7rem;color:var(--green-l);text-decoration:none;border:1px solid rgba(0,168,107,.2);padding:.18rem .55rem;border-radius:10px;}
+.fee-portal:hover{background:rgba(0,168,107,.08);}
+
+/* EXAMPLES */
+.ex-cats{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.2rem;}
+.ex-cat-btn{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:20px;padding:.28rem .8rem;font-size:.75rem;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;}
+.ex-cat-btn:hover,.ex-cat-btn.active{background:rgba(255,107,0,.08);border-color:rgba(255,107,0,.2);color:var(--saffron-l);}
+.ex-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;}
+.ex-card{background:rgba(14,31,58,.8);border:1px solid var(--border);border-radius:14px;padding:1.2rem;transition:all .2s;}
+.ex-card:hover{border-color:rgba(255,107,0,.25);transform:translateY(-2px);}
+.ex-category{font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--saffron);margin-bottom:.35rem;}
+.ex-title{font-weight:700;font-size:.9rem;margin-bottom:.35rem;}
+.ex-desc{font-size:.77rem;color:var(--muted);line-height:1.5;margin-bottom:.6rem;}
+.ex-footer{display:flex;align-items:center;justify-content:space-between;}
+.ex-state{font-size:.7rem;color:var(--muted);}
+.ex-use-btn{background:rgba(0,107,63,.1);border:1px solid rgba(0,107,63,.2);color:var(--green-l);padding:.25rem .65rem;border-radius:8px;font-size:.71rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;}
+.ex-use-btn:hover{background:rgba(0,107,63,.2);}
+.lex-meta{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.55rem;}
+.lex-badge{font-size:.63rem;font-weight:700;padding:.18rem .5rem;border-radius:6px;letter-spacing:.02em;}
+.lex-diff-easy{background:rgba(0,107,63,.15);color:#4ade80;}
+.lex-diff-medium{background:rgba(255,186,8,.12);color:#fbbf24;}
+.lex-diff-hard{background:rgba(220,38,38,.12);color:#f87171;}
+.lex-succ-high{background:rgba(0,107,63,.1);color:#86efac;}
+.lex-succ-medium{background:rgba(255,186,8,.1);color:#fde68a;}
+.lex-succ-low{background:rgba(220,38,38,.1);color:#fca5a5;}
+.lex-law{font-size:.7rem;color:rgba(255,255,255,.35);margin-bottom:.55rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lex-tool-consumer{color:#fb923c;}
+.lex-tool-labour{color:#60a5fa;}
+.lex-tool-legal_notice{color:#a78bfa;}
+.lex-tool-second_appeal{color:#34d399;}
+
+/* VISUAL FILING GUIDE */
+.guide-steps{display:flex;flex-direction:column;gap:1.75rem;}
+.guide-step{display:flex;gap:1.5rem;align-items:flex-start;}
+.guide-num{font-size:2.2rem;line-height:1;flex-shrink:0;}
+.guide-content{flex:1;}
+.guide-title{font-size:1.1rem;font-weight:700;margin-bottom:.5rem;}
+.guide-desc{font-size:.88rem;color:var(--muted);line-height:1.65;margin-bottom:.75rem;}
+.guide-tips{display:flex;flex-direction:column;gap:.4rem;}
+.guide-tip{background:rgba(0,107,63,.08);border-left:3px solid var(--green-l);padding:.45rem .85rem;font-size:.8rem;color:rgba(255,255,255,.7);border-radius:4px;}
+.guide-faqs{margin-top:2.5rem;}
+.faq-item{background:rgba(14,31,58,.8);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:.85rem;transition:all .2s;}
+.faq-item:hover{border-color:rgba(255,107,0,.2);}
+.faq-q{font-size:.92rem;font-weight:700;color:var(--saffron-l);margin-bottom:.5rem;}
+.faq-a{font-size:.83rem;color:var(--muted);line-height:1.65;}
+
+/* SUCCESS STORIES */
+.success-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem;}
+.success-card{background:rgba(14,31,58,.8);border:1px solid var(--border);border-radius:14px;padding:1.3rem;transition:all .2s;position:relative;}
+.success-card:hover{border-color:rgba(0,168,107,.3);transform:translateY(-3px);}
+.success-badge{position:absolute;top:1rem;right:1rem;background:rgba(0,168,107,.15);border:1px solid rgba(0,168,107,.3);color:var(--green-l);padding:.2rem .65rem;border-radius:20px;font-size:.67rem;font-weight:700;}
+.success-category{font-size:.68rem;color:var(--saffron);font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.45rem;}
+.success-title{font-size:1rem;font-weight:700;margin-bottom:.65rem;line-height:1.3;}
+.success-story{font-size:.82rem;color:var(--muted);line-height:1.65;margin-bottom:.85rem;font-style:italic;}
+.success-meta{display:flex;gap:1rem;font-size:.72rem;color:rgba(255,255,255,.5);margin-bottom:.55rem;}
+.success-impact{background:rgba(0,168,107,.08);border:1px solid rgba(0,168,107,.2);border-radius:8px;padding:.45rem .75rem;font-size:.75rem;color:var(--green-l);font-weight:600;}
+
+/* SETTINGS PAGE */
+.settings-container{max-width:800px;margin:0 auto;}
+.settings-section{background:rgba(14,31,58,.8);border:1px solid var(--border);border-radius:14px;padding:1.8rem;margin-bottom:1.5rem;}
+.settings-header{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:1.5rem;}
+.settings-title{font-size:1.1rem;font-weight:700;margin-bottom:.4rem;}
+.settings-desc{font-size:.8rem;color:var(--muted);line-height:1.6;}
+.settings-save-btn{background:linear-gradient(135deg,var(--saffron),var(--saffron-l));border:none;color:white;padding:.7rem 1.4rem;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.settings-save-btn:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(255,107,0,.3);}
+.settings-form{display:flex;flex-direction:column;gap:1rem;}
+.settings-notice{display:flex;gap:1rem;background:rgba(0,168,107,.08);border:1px solid rgba(0,168,107,.2);border-radius:12px;padding:1.2rem;margin-bottom:1.5rem;}
+.notice-icon{font-size:2rem;line-height:1;}
+.notice-title{font-size:.88rem;font-weight:700;color:var(--green-l);margin-bottom:.35rem;}
+.notice-text{font-size:.8rem;color:rgba(255,255,255,.65);line-height:1.65;}
+.settings-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:.85rem;margin-bottom:1.5rem;}
+.settings-action-btn{padding:.8rem;border-radius:10px;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s;border:1.5px solid var(--border);font-family:'DM Sans',sans-serif;}
+.btn-clear{background:rgba(248,113,113,.08);border-color:rgba(248,113,113,.3);color:#F87171;}
+.btn-clear:hover{background:rgba(248,113,113,.15);}
+.btn-export{background:rgba(212,160,23,.08);border-color:rgba(212,160,23,.3);color:var(--gold);}
+.btn-export:hover{background:rgba(212,160,23,.15);}
+.btn-import{background:rgba(0,168,107,.08);border-color:rgba(0,168,107,.3);color:var(--green-l);}
+.btn-import:hover{background:rgba(0,168,107,.15);}
+.about-content{font-size:.85rem;line-height:1.85;color:var(--muted);}
+.about-content strong{color:var(--text);}
+.settings-link{display:inline-block;color:var(--saffron-l);text-decoration:none;margin-right:1.5rem;margin-top:.5rem;transition:color .2s;}
+.settings-link:hover{color:var(--saffron);}
+
+/* TRUST BADGES */
+.trust-badges{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:2rem;animation:fadeUp .5s .32s ease both;}
+.trust-badge{display:flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:20px;padding:.35rem .9rem;font-size:.75rem;color:var(--muted);}
+.trust-badge .badge-icon{font-size:.85rem;}
+.trust-badge strong{color:var(--green-l);}
+
+/* QUICK ACTIONS */
+.quick-actions{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;margin-bottom:2.5rem;animation:fadeUp .5s .35s ease both;}
+.quick-action-btn{display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 1.5rem;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;transition:all .2s;border:none;text-decoration:none;}
+.quick-action-btn:hover{transform:translateY(-2px);}
+.qa-primary{background:linear-gradient(135deg,var(--saffron),var(--saffron-l));color:white;box-shadow:0 8px 24px rgba(255,107,0,.3);}
+.qa-primary:hover{box-shadow:0 12px 32px rgba(255,107,0,.4);}
+.qa-secondary{background:rgba(255,255,255,.05);border:1px solid var(--border) !important;color:var(--text);}
+.qa-secondary:hover{background:rgba(255,255,255,.08);border-color:rgba(255,107,0,.3) !important;}
+
+/* TELEGRAM PROMO */
+.tg-promo{background:linear-gradient(135deg,rgba(0,136,204,.1),rgba(0,136,204,.03));border:1px solid rgba(0,136,204,.2);border-radius:20px;padding:2.5rem;margin:3rem 0;text-align:center;position:relative;overflow:hidden;}
+.tg-promo::before{content:'';position:absolute;top:-50%;right:-20%;width:300px;height:300px;background:radial-gradient(circle,rgba(0,136,204,.08),transparent 70%);pointer-events:none;}
+.tg-promo-badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(0,136,204,.15);border:1px solid rgba(0,136,204,.3);color:#0088cc;padding:.3rem .9rem;border-radius:20px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:1rem;}
+.tg-promo h3{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;margin-bottom:.75rem;}
+.tg-promo h3 span{color:#0088cc;}
+.tg-promo-desc{color:var(--muted);font-size:.95rem;line-height:1.7;max-width:550px;margin:0 auto 1.5rem;}
+.tg-features{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;margin-bottom:1.5rem;}
+.tg-feature{display:flex;align-items:center;gap:.35rem;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:20px;padding:.3rem .8rem;font-size:.77rem;color:var(--muted);}
+.tg-feature strong{color:var(--text);}
+.tg-btn{display:inline-flex;align-items:center;gap:.6rem;background:linear-gradient(135deg,#0088cc,#00aaff);color:white;padding:.85rem 2rem;border-radius:12px;font-size:1rem;font-weight:700;text-decoration:none;transition:all .2s;border:none;cursor:pointer;box-shadow:0 8px 24px rgba(0,136,204,.3);}
+.tg-btn:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,136,204,.4);}
+.tg-btn-sub{display:block;font-size:.72rem;color:rgba(255,255,255,.7);margin-top:.5rem;}
+
+/* FLOATING TELEGRAM BUTTON */
+.float-tg{position:fixed;bottom:2rem;right:2rem;z-index:999;display:flex;align-items:center;gap:.5rem;background:linear-gradient(135deg,#0088cc,#00aaff);color:white;padding:.7rem 1.2rem;border-radius:50px;text-decoration:none;font-size:.85rem;font-weight:600;box-shadow:0 6px 20px rgba(0,136,204,.4);transition:all .3s;animation:float-pulse 3s ease infinite;}
+.float-tg:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 10px 30px rgba(0,136,204,.5);}
+.float-tg .tg-icon{font-size:1.3rem;}
+@keyframes float-pulse{0%,100%{box-shadow:0 6px 20px rgba(0,136,204,.4)}50%{box-shadow:0 6px 30px rgba(0,136,204,.6)}}
+
+/* LEGAL TOOLS DROPDOWN */
+.nav-dropdown{position:relative;}
+.nav-dropdown-btn{background:transparent;border:none;color:var(--muted);padding:.45rem .9rem;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:500;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:.3rem;}
+.nav-dropdown-btn:hover,.nav-dropdown-btn.active{background:rgba(255,107,0,.08);color:var(--saffron-l);}
+.nav-dropdown-btn::after{content:'▾';font-size:.7rem;}
+.nav-dropdown-menu{display:none;position:absolute;top:calc(100% + .5rem);left:0;background:var(--navy-mid);border:1px solid rgba(255,107,0,.2);border-radius:12px;box-shadow:0 16px 40px rgba(0,0,0,.5);z-index:200;min-width:230px;padding:.5rem;overflow:hidden;}
+.nav-dropdown-menu.open{display:block;}
+.nav-dropdown-item{display:flex;align-items:center;gap:.75rem;padding:.6rem .9rem;border-radius:8px;color:var(--muted);text-decoration:none;font-size:.82rem;cursor:pointer;transition:all .15s;border:none;background:none;font-family:'DM Sans',sans-serif;width:100%;text-align:left;}
+.nav-dropdown-item:hover{background:rgba(255,107,0,.08);color:var(--saffron-l);}
+.nav-dropdown-item .ddi-icon{font-size:1rem;width:20px;text-align:center;}
+.nav-dropdown-item .ddi-label{flex:1;}
+.nav-dropdown-item .ddi-badge{background:rgba(0,168,107,.15);border:1px solid rgba(0,168,107,.3);color:var(--green-l);font-size:.62rem;padding:.1rem .45rem;border-radius:8px;font-weight:700;}
+.nav-dropdown-divider{height:1px;background:var(--border);margin:.3rem .5rem;}
+
+/* LEGAL TOOL PAGES */
+.tool-hero{background:linear-gradient(135deg,rgba(255,107,0,.06),transparent);border:1px solid rgba(255,107,0,.12);border-radius:20px;padding:2rem;margin-bottom:2rem;display:flex;align-items:flex-start;gap:1.5rem;}
+.tool-hero-icon{font-size:3rem;line-height:1;flex-shrink:0;}
+.tool-hero-title{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;margin-bottom:.4rem;}
+.tool-hero-desc{font-size:.9rem;color:var(--muted);line-height:1.6;margin-bottom:.75rem;}
+.tool-hero-badges{display:flex;flex-wrap:wrap;gap:.5rem;}
+.tool-hero-badge{background:rgba(0,107,63,.1);border:1px solid rgba(0,107,63,.2);color:var(--green-l);padding:.2rem .65rem;border-radius:12px;font-size:.72rem;font-weight:600;}
+.tool-card{background:rgba(17,34,64,.85);border:1px solid rgba(255,107,0,.2);border-radius:20px;padding:2rem;backdrop-filter:blur(20px);box-shadow:0 20px 50px rgba(0,0,0,.3);margin-bottom:2rem;}
+.tool-result{display:none;margin-top:1.5rem;animation:fadeUp .35s ease both;}
+.tool-result.show{display:block;}
+.tool-disclaimer{background:rgba(212,160,23,.06);border:1px solid rgba(212,160,23,.2);border-radius:12px;padding:.9rem 1.1rem;font-size:.78rem;color:rgba(255,255,255,.6);line-height:1.6;margin-top:1.5rem;}
+.tool-disclaimer strong{color:var(--gold);}
+.back-btn{display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);padding:.4rem .9rem;border-radius:8px;font-size:.8rem;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:1.5rem;transition:all .2s;}
+.back-btn:hover{border-color:rgba(255,107,0,.3);color:var(--saffron-l);}
+.tool-output{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:12px;padding:1.3rem;font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.8;color:var(--text);white-space:pre-wrap;margin-bottom:1rem;}
+.tool-action-btns{display:flex;gap:.75rem;flex-wrap:wrap;}
+.tool-action-btn{display:inline-flex;align-items:center;gap:.4rem;padding:.65rem 1.25rem;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.83rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;}
+.tab-copy{background:rgba(255,255,255,.06);border:1px solid var(--border) !important;color:var(--text);}
+.tab-copy:hover{background:rgba(255,255,255,.1);}
+.tab-dl{background:linear-gradient(135deg,var(--saffron),var(--saffron-l));color:white;}
+.tab-dl:hover{box-shadow:0 8px 20px rgba(255,107,0,.3);}
+.tab-share{background:rgba(0,136,204,.1);border:1px solid rgba(0,136,204,.2) !important;color:#4fc3f7;}
+.tab-share:hover{background:rgba(0,136,204,.2);}
+.tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-bottom:2.5rem;}
+.tool-entry-card{background:rgba(14,31,58,.8);border:1px solid var(--border);border-radius:16px;padding:1.5rem;transition:all .25s;cursor:pointer;text-align:left;}
+.tool-entry-card:hover{border-color:rgba(255,107,0,.3);transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.3);}
+.tec-icon{font-size:2rem;margin-bottom:.75rem;}
+.tec-title{font-weight:700;font-size:.95rem;margin-bottom:.35rem;}
+.tec-desc{font-size:.78rem;color:var(--muted);line-height:1.5;margin-bottom:.75rem;}
+.tec-tag{display:inline-block;background:rgba(0,168,107,.08);border:1px solid rgba(0,168,107,.2);color:var(--green-l);font-size:.68rem;padding:.15rem .55rem;border-radius:8px;font-weight:600;}
+.tec-tag.orange{background:rgba(255,107,0,.08);border-color:rgba(255,107,0,.2);color:var(--saffron-l);}
+
+/* HAMBURGER MENU */
+.hamburger{display:none;background:none;border:none;color:var(--text);font-size:1.5rem;cursor:pointer;padding:.3rem;}
+.nav-buttons.mobile-open{display:flex !important;}
+
+/* ABOUT PAGE */
+.about-hero{text-align:center;margin-bottom:3rem;}
+.about-hero h2{font-family:'Playfair Display',serif;font-size:2.2rem;margin-bottom:1rem;}
+.about-hero p{color:var(--muted);font-size:1rem;line-height:1.7;max-width:600px;margin:0 auto;}
+.about-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:2.5rem;}
+.about-card{background:rgba(14,31,58,.8);border:1px solid var(--border);border-radius:16px;padding:1.5rem;transition:all .2s;}
+.about-card:hover{border-color:rgba(255,107,0,.25);transform:translateY(-3px);}
+.about-card .card-icon{font-size:2rem;margin-bottom:.75rem;}
+.about-card h4{font-size:1rem;font-weight:700;margin-bottom:.5rem;}
+.about-card p{font-size:.83rem;color:var(--muted);line-height:1.6;}
+.tech-stack{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2.5rem;}
+.tech-item{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:1rem;text-align:center;transition:all .2s;}
+.tech-item:hover{border-color:rgba(255,107,0,.2);}
+.tech-item .tech-icon{font-size:1.5rem;margin-bottom:.4rem;}
+.tech-item .tech-name{font-size:.8rem;font-weight:600;margin-bottom:.2rem;}
+.tech-item .tech-desc{font-size:.7rem;color:var(--muted);}
+.privacy-box{background:rgba(0,107,63,.06);border:1px solid rgba(0,107,63,.2);border-radius:16px;padding:2rem;margin-bottom:2.5rem;}
+.privacy-box h3{color:var(--green-l);margin-bottom:1rem;font-size:1.2rem;}
+.privacy-list{list-style:none;padding:0;}
+.privacy-list li{padding:.5rem 0;font-size:.88rem;color:var(--muted);border-bottom:1px solid rgba(255,255,255,.04);display:flex;gap:.5rem;align-items:flex-start;}
+.privacy-list li:last-child{border-bottom:none;}
+.contact-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;}
+.contact-card{background:rgba(14,31,58,.8);border:1px solid var(--border);border-radius:12px;padding:1.2rem;display:flex;align-items:center;gap:1rem;transition:all .2s;text-decoration:none;color:var(--text);}
+.contact-card:hover{border-color:rgba(255,107,0,.25);transform:translateY(-2px);}
+.contact-card .c-icon{font-size:1.5rem;}
+.contact-card .c-label{font-size:.75rem;color:var(--muted);}
+.contact-card .c-value{font-size:.88rem;font-weight:600;}
+
+/* FOOTER */
+footer{position:relative;z-index:1;padding:3rem 3rem 2rem;border-top:1px solid var(--border);}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2rem;margin-bottom:2rem;}
+.footer-brand{}
+.footer-brand-logo{font-family:'Playfair Display',serif;font-weight:900;font-size:1.3rem;margin-bottom:.75rem;}
+.footer-brand-logo span{color:var(--saffron);}
+.footer-brand-desc{font-size:.82rem;color:var(--muted);line-height:1.6;margin-bottom:1rem;max-width:300px;}
+.footer-social{display:flex;gap:.5rem;}
+.footer-social a{display:flex;align-items:center;justify-content:center;width:34px;height:34px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;color:var(--muted);text-decoration:none;font-size:.9rem;transition:all .2s;}
+.footer-social a:hover{background:rgba(255,107,0,.1);border-color:rgba(255,107,0,.3);color:var(--saffron-l);}
+.footer-col h4{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text);margin-bottom:.85rem;}
+.footer-col a{display:block;color:var(--muted);text-decoration:none;font-size:.82rem;padding:.3rem 0;transition:color .2s;}
+.footer-col a:hover{color:var(--saffron-l);}
+.footer-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:1.5rem;border-top:1px solid var(--border);flex-wrap:wrap;gap:.5rem;}
+.footer-copy{font-size:.73rem;color:var(--muted);}
+.footer-badges{display:flex;gap:.6rem;align-items:center;}
+.footer-badge{background:rgba(0,107,63,.08);border:1px solid rgba(0,107,63,.2);border-radius:16px;padding:.2rem .7rem;font-size:.68rem;color:var(--green-l);}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:768px){
+  .hamburger{display:block;}
+  .nav-buttons{display:none;position:absolute;top:100%;left:0;right:0;background:rgba(10,22,40,.98);backdrop-filter:blur(20px);flex-direction:column;padding:1rem;gap:.2rem;border-bottom:1px solid rgba(255,107,0,.15);}
+  .nav-buttons.mobile-open{display:flex;}
+  .about-grid{grid-template-columns:1fr;}
+  .tech-stack{grid-template-columns:repeat(2,1fr);}
+  .contact-grid{grid-template-columns:1fr;}
+  .footer-top{grid-template-columns:1fr 1fr;}
+  .tg-promo{padding:1.5rem;margin:2rem 0;}
+  .tg-promo h3{font-size:1.4rem;}
+  .float-tg span:not(.tg-icon){display:none;}
+  .float-tg{padding:.7rem;}
+}
+@media(max-width:640px){
+  nav{padding:1rem 1.2rem;}
+  .nav-btn{padding:.38rem .6rem;font-size:.75rem;}
+  .stats-row{gap:1.5rem;}
+  .form-row{grid-template-columns:1fr;}
+  .scores{grid-template-columns:1fr 1fr 1fr;}
+  .steps-grid{grid-template-columns:1fr 1fr;}
+  .steps-grid::before{display:none;}
+  .action-btns{grid-template-columns:1fr;}
+  .main-card{padding:1.4rem;}
+  .fees-grid{grid-template-columns:1fr 1fr;}
+  .ex-grid{grid-template-columns:1fr;}
+  .tracker-stats{grid-template-columns:1fr 1fr;}
+  .success-grid{grid-template-columns:1fr;}
+  .guide-step{flex-direction:column;gap:1rem;}
+  .guide-num{font-size:1.8rem;}
+  .settings-header{flex-direction:column;}
+  .settings-actions{grid-template-columns:1fr;}
+  .trust-badges{gap:.5rem;}
+  .quick-actions{flex-direction:column;align-items:center;}
+  .footer-top{grid-template-columns:1fr;}
+  .footer-bottom{flex-direction:column;text-align:center;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo" onclick="showPage('home')">
+    <div class="logo-icon">🏛</div>
+    RTI<span>Assist</span>
+  </div>
+  <button class="hamburger" onclick="toggleMobileMenu()">☰</button>
+  <div class="nav-buttons" id="navButtons">
+    <button class="nav-btn active" data-translate="nav.generate" onclick="showPage('home',this)">🏠 RTI</button>
+    <button class="nav-btn" data-translate="nav.tracker" onclick="showPage('tracker',this)">📋 My RTIs</button>
+    <!-- Legal Tools Dropdown -->
+    <div class="nav-dropdown">
+      <button class="nav-dropdown-btn" id="legalToolsBtn" onclick="document.getElementById('legalMenu').classList.toggle('open')">⚖️ Legal Tools</button>
+      <div class="nav-dropdown-menu" id="legalMenu">
+        <button class="nav-dropdown-item" onclick="showPage('legaltools',null);closeLegalMenu()"><span class="ddi-icon">🧰</span><span class="ddi-label">All Legal Tools</span></button>
+        <div class="nav-dropdown-divider"></div>
+        <button class="nav-dropdown-item" onclick="showPage('second-appeal',null);closeLegalMenu()"><span class="ddi-icon">📝</span><span class="ddi-label">Second Appeal (CIC)</span><span class="ddi-badge">FREE</span></button>
+        <button class="nav-dropdown-item" onclick="showPage('consumer-court',null);closeLegalMenu()"><span class="ddi-icon">🛒</span><span class="ddi-label">Consumer Complaint</span><span class="ddi-badge">FREE</span></button>
+        <button class="nav-dropdown-item" onclick="showPage('legal-notice',null);closeLegalMenu()"><span class="ddi-icon">📜</span><span class="ddi-label">Legal Notice</span><span class="ddi-badge">FREE</span></button>
+        <button class="nav-dropdown-item" onclick="showPage('labour-complaint',null);closeLegalMenu()"><span class="ddi-icon">💼</span><span class="ddi-label">Labour Complaint</span><span class="ddi-badge">FREE</span></button>
+        <div class="nav-dropdown-divider"></div>
+        <button class="nav-dropdown-item" onclick="showPage('legal-examples',null);closeLegalMenu()"><span class="ddi-icon">💡</span><span class="ddi-label">Legal Examples Library</span></button>
+      </div>
+    </div>
+    <button class="nav-btn" data-translate="nav.fees" onclick="showPage('fees',this)">💰 Fees</button>
+    <button class="nav-btn" data-translate="nav.examples" onclick="showPage('examples',this)">💡 Examples</button>
+    <button class="nav-btn" onclick="showPage('about',this)">ℹ️ About</button>
+    <button class="nav-btn" onclick="showPage('settings',this)">⚙️ Settings</button>
+    <button class="nav-btn" id="langToggleBtn" onclick="toggleUILanguage()" data-translate="nav.langToggle">🌐 हिन्दी</button>
+  </div>
+</nav>
+
+<!-- ══════════ PAGE: HOME ══════════ -->
+<div class="page active" id="home">
+
+<section class="hero">
+  <div class="hero-tag" data-translate="hero.tag">🇮🇳 Free Forever</div>
+  <h1><span data-translate="hero.title1">File RTI in</span><br/><span class="org" data-translate="hero.title2">Any</span> <span data-translate="hero.title3">Indian</span><br/><span class="teal" data-translate="hero.title4">Language</span></h1>
+  <p class="hero-sub" data-translate="hero.subtitle">India's most powerful free AI tool. Advanced multi-layer reasoning. 11 languages, 28 states. Section 8 exemption check. Appeal generator. 100% free Forever.</p>
+
+  <div class="lang-pills">
+    <span class="lang-pill">हिंदी</span><span class="lang-pill">मराठी</span>
+    <span class="lang-pill">தமிழ்</span><span class="lang-pill">తెలుగు</span>
+    <span class="lang-pill">ಕನ್ನಡ</span><span class="lang-pill">বাংলা</span>
+    <span class="lang-pill">ગુજરાતી</span><span class="lang-pill">ਪੰਜਾਬੀ</span>
+    <span class="lang-pill">മലയാളം</span><span class="lang-pill">ଓଡ଼ିଆ</span>
+    <span class="lang-pill">English</span>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat"><div class="stat-num">30s</div><div class="stat-label">Draft Ready</div></div>
+    <div class="stat"><div class="stat-num">28+</div><div class="stat-label">States</div></div>
+    <div class="stat"><div class="stat-num">11</div><div class="stat-label">Languages</div></div>
+    <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Free</div></div>
+  </div>
+
+  <div class="feature-chips">
+    <span class="fchip"><b>⚡</b> AI Draft</span>
+    <span class="fchip"><b>📊</b> Quality Score</span>
+    <span class="fchip"><b>📅</b> 30-Day Deadline Tracker</span>
+    <span class="fchip"><b>📝</b> Appeal Letter</span>
+    <span class="fchip"><b>🟢</b> WhatsApp Share</span>
+    <span class="fchip"><b>💰</b> Fee Calculator</span>
+    <span class="fchip"><b>⚠️</b> Exemption Risk Check</span>
+  </div>
+
+  <!-- TRUST BADGES -->
+  <div class="trust-badges">
+    <div class="trust-badge"><span class="badge-icon">✅</span> <strong>100% Free</strong> — No Hidden Charges</div>
+    <div class="trust-badge"><span class="badge-icon">🔒</span> <strong>Privacy First</strong> — No Data Stored</div>
+    <div class="trust-badge"><span class="badge-icon">⚡</span> <strong>30 Sec</strong> — Instant Draft</div>
+    <div class="trust-badge"><span class="badge-icon">🏛️</span> <strong>RTI Act 2005</strong> — Legally Compliant</div>
+  </div>
+
+  <!-- QUICK ACTIONS -->
+  <div class="quick-actions">
+    <button class="quick-action-btn qa-primary" onclick="document.querySelector('.main-card').scrollIntoView({behavior:'smooth'})">🚀 Generate RTI Now</button>
+    <button class="quick-action-btn qa-secondary" onclick="showPage('guide',null)">📖 How It Works</button>
+    <button class="quick-action-btn qa-secondary" onclick="showPage('stories',null)">🌟 Success Stories</button>
+  </div>
+
+  <!-- GENERATOR CARD -->
+  <div class="main-card">
+    <div class="card-header">
+      <div class="step-indicator">
+        <div class="step active" id="s1"></div>
+        <div class="step" id="s2"></div>
+        <div class="step" id="s3"></div>
+      </div>
+      <div class="card-title">Generate Your RTI Application</div>
+    </div>
+
+    <!-- LANGUAGE -->
+    <div class="form-group">
+      <label data-translate="form.langLabel">Document Language</label>
+      <div class="lang-btns" id="langBtns">
+        <button class="lbtn sel" onclick="selLang(this,'english')">English</button>
+        <button class="lbtn" onclick="selLang(this,'hindi')">हिंदी</button>
+        <button class="lbtn" onclick="selLang(this,'marathi')">मराठी</button>
+        <button class="lbtn" onclick="selLang(this,'tamil')">தமிழ்</button>
+        <button class="lbtn" onclick="selLang(this,'telugu')">తెలుగు</button>
+        <button class="lbtn" onclick="selLang(this,'kannada')">ಕನ್ನಡ</button>
+        <button class="lbtn" onclick="selLang(this,'bengali')">বাংলা</button>
+        <button class="lbtn" onclick="selLang(this,'gujarati')">ગુજરાતી</button>
+        <button class="lbtn" onclick="selLang(this,'punjabi')">ਪੰਜਾਬੀ</button>
+        <button class="lbtn" onclick="selLang(this,'malayalam')">മലയാളം</button>
+        <button class="lbtn" onclick="selLang(this,'odia')">ଓଡ଼ିଆ</button>
+      </div>
+    </div>
+
+    <span class="ex-lbl">💡 Quick examples — click to fill:</span>
+    <div class="chips">
+      <div class="chip" onclick="setEx('ration')">🍚 Ration Card</div>
+      <div class="chip" onclick="setEx('passport')">📘 Passport</div>
+      <div class="chip" onclick="setEx('pension')">👴 Pension</div>
+      <div class="chip" onclick="setEx('land')">🌾 Land Mutation</div>
+      <div class="chip" onclick="setEx('scholarship')">🎓 Scholarship</div>
+      <div class="chip" onclick="setEx('water')">💧 Water Supply</div>
+      <div class="chip" onclick="setEx('road')">🛣️ Road</div>
+      <div class="chip" onclick="setEx('electricity')">⚡ Electricity</div>
+      <div class="chip" onclick="showPage('examples',null)">📚 All Examples →</div>
+    </div>
+
+    <div class="form-group">
+      <label data-translate="form.descLabel">Describe what information you need</label>
+      <textarea id="description" data-translate="form.descPlaceholder" placeholder="Example: My ration card application was rejected 3 months ago in Maharashtra and I want to know the exact reason, who rejected it, and see the complete file noting..."></textarea>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>State / Union Territory</label>
+        <select id="state">
+          <option value="">Central Government</option>
+          <optgroup label="── States ──">
+            <option>Andhra Pradesh</option><option>Arunachal Pradesh</option>
+            <option>Assam</option><option>Bihar</option><option>Chhattisgarh</option>
+            <option>Goa</option><option>Gujarat</option><option>Haryana</option>
+            <option>Himachal Pradesh</option><option>Jharkhand</option>
+            <option>Karnataka</option><option>Kerala</option>
+            <option>Madhya Pradesh</option><option>Maharashtra</option>
+            <option>Manipur</option><option>Meghalaya</option><option>Mizoram</option>
+            <option>Nagaland</option><option>Odisha</option><option>Punjab</option>
+            <option>Rajasthan</option><option>Sikkim</option><option>Tamil Nadu</option>
+            <option>Telangana</option><option>Tripura</option>
+            <option>Uttar Pradesh</option><option>Uttarakhand</option>
+            <option>West Bengal</option>
+          </optgroup>
+          <optgroup label="── Union Territories ──">
+            <option>Andaman and Nicobar Islands</option><option>Chandigarh</option>
+            <option>Dadra and Nagar Haveli</option><option>Daman and Diu</option>
+            <option>Delhi</option><option>Jammu and Kashmir</option><option>Ladakh</option>
+            <option>Lakshadweep</option><option>Puducherry</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Category (Optional)</label>
+        <select id="category">
+          <option value="">Auto-detect</option>
+          <option>Food &amp; Ration</option><option>Land &amp; Revenue</option>
+          <option>Passport &amp; Visa</option><option>Pension &amp; Social Security</option>
+          <option>Education &amp; Scholarship</option><option>Health</option>
+          <option>Police &amp; Law</option><option>Municipal Services</option>
+          <option>Electricity &amp; Water</option><option>Roads &amp; Infrastructure</option>
+          <option>Employment</option><option>Banking &amp; Finance</option><option>Other</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="submit-btn" id="submitBtn" onclick="generateRTI()">
+      <div class="spinner"></div>
+      <span class="btn-text">⚡ Generate RTI Application — Free</span>
+    </button>
+    <div class="err-box" id="errorBox"></div>
+
+    <!-- RESULT -->
+    <div class="result" id="resultSection">
+
+      <div class="res-header">
+        <div>
+          <div class="res-title">✅ RTI Application Generated!</div>
+          <div class="res-meta">
+            Dept: <strong id="resDept">—</strong> · Ministry: <strong id="resMinistry">—</strong><br/>
+            Urgency: <strong id="resUrgency">—</strong> · Confidence: <strong id="resConf">—</strong>
+          </div>
+        </div>
+        <div style="font-size:1.5rem;">🏛</div>
+      </div>
+
+      <a class="portal-link" id="portalLink" href="#" target="_blank">
+        <div style="font-size:1.1rem;">🔗</div>
+        <div class="portal-text">
+          <strong id="portalName">File Online Now</strong>
+          <span id="portalDesc">Official RTI filing portal</span>
+        </div>
+        <div class="portal-arrow">→</div>
+      </a>
+
+      <div class="tags" id="tagsRow"></div>
+
+      <div class="scores">
+        <div class="score-card"><div class="score-val" id="scoreVal">—</div><div class="score-lbl">Quality Score</div></div>
+        <div class="score-card"><div class="score-val" id="successVal">—</div><div class="score-lbl">Success Chance</div></div>
+        <div class="score-card"><div class="score-val" id="riskVal">—</div><div class="score-lbl">Exempt Risk</div></div>
+      </div>
+
+      <!-- ✅ FEATURE: DEADLINE TRACKER -->
+      <div class="deadline-box">
+        <div class="deadline-title">📅 Response Deadline Tracker</div>
+        <div class="deadline-grid">
+          <div class="dl-item">
+            <div class="dl-num" id="dlDays">30</div>
+            <div class="dl-sub">Days Total</div>
+            <div class="dl-date" id="dlDeadlineDate">—</div>
+          </div>
+          <div class="dl-item">
+            <div class="dl-num" id="dlRemain" style="color:var(--green-l)">30</div>
+            <div class="dl-sub">Days Left</div>
+            <div class="dl-date">After filing today</div>
+          </div>
+          <div class="dl-item">
+            <div class="dl-num" style="font-size:1.1rem;margin-top:.2rem">⏰</div>
+            <div class="dl-sub">Live Countdown</div>
+            <div class="countdown">
+              <div class="cd-box" id="cdD">00</div><span class="cd-sep">d</span>
+              <div class="cd-box" id="cdH">00</div><span class="cd-sep">h</span>
+              <div class="cd-box" id="cdM">00</div><span class="cd-sep">m</span>
+            </div>
+          </div>
+        </div>
+        <button class="btn-save-tracker" onclick="saveToTracker()">📋 Save to My RTIs Tracker</button>
+      </div>
+
+      <!-- DRAFT BOX -->
+      <div class="draft-box">
+        <div class="draft-header">
+          <span>📄 Your RTI Application Draft</span>
+          <!-- ✅ FEATURE: WHATSAPP SHARE -->
+          <div class="draft-actions">
+            <button class="copy-btn" onclick="copyDraft()">📋 Copy</button>
+            <button class="wa-btn" onclick="shareWhatsApp()">🟢 WhatsApp</button>
+          </div>
+        </div>
+        <div class="draft-content" id="draftContent"></div>
+      </div>
+
+      <div class="warn-box" id="warningsBox" style="display:none">
+        <div class="warn-title">⚠️ AI Suggestions</div>
+        <div id="warningsList"></div>
+      </div>
+
+      <div class="inst-box">
+        <div class="inst-title">📋 How to File This RTI</div>
+        <div class="inst-content" id="instructionsContent"></div>
+      </div>
+
+      <!-- ✅ FEATURE: APPEAL GENERATOR -->
+      <button class="btn-appeal" onclick="openAppealModal()">
+        📝 Generate First Appeal Letter — If PIO Doesn't Respond in 30 Days
+      </button>
+
+      <div class="action-btns">
+        <button class="action-btn btn-download" onclick="downloadDraft()">📄 Download PDF</button>
+        <button class="action-btn btn-new" onclick="resetForm()">🔄 New Application</button>
+      </div>
+
+    </div><!-- /result -->
+  </div><!-- /main-card -->
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section">
+  <div class="section-label">Under the Hood</div>
+  <div class="section-title">4-Layer AI Reasoning Pipeline</div>
+  <div class="steps-grid">
+    <div class="step-card"><div class="step-num">1</div><h3>Intent Classifier</h3><p>Identifies department, ministry, urgency from your description</p></div>
+    <div class="step-card"><div class="step-num">2</div><h3>PIO Resolver</h3><p>Finds the correct Public Information Officer and address for your state</p></div>
+    <div class="step-card"><div class="step-num">3</div><h3>Draft Generator</h3><p>Legally correct RTI under Section 6(1) of RTI Act 2005</p></div>
+    <div class="step-card"><div class="step-num">4</div><h3>Quality Checker</h3><p>Section 8 exemption risk check + quality score out of 100</p></div>
+  </div>
+</section>
+
+<section class="how-section" style="padding-top:0">
+  <div class="section-label">Multilingual</div>
+  <div class="section-title">11 Indian Languages</div>
+  <div class="langs-grid">
+    <div class="lang-card"><div class="lang-native">हिंदी</div><div class="lang-eng">Hindi</div></div>
+    <div class="lang-card"><div class="lang-native">मराठी</div><div class="lang-eng">Marathi</div></div>
+    <div class="lang-card"><div class="lang-native">தமிழ்</div><div class="lang-eng">Tamil</div></div>
+    <div class="lang-card"><div class="lang-native">తెలుగు</div><div class="lang-eng">Telugu</div></div>
+    <div class="lang-card"><div class="lang-native">ಕನ್ನಡ</div><div class="lang-eng">Kannada</div></div>
+    <div class="lang-card"><div class="lang-native">বাংলা</div><div class="lang-eng">Bengali</div></div>
+    <div class="lang-card"><div class="lang-native">ગુજરાતી</div><div class="lang-eng">Gujarati</div></div>
+    <div class="lang-card"><div class="lang-native">ਪੰਜਾਬੀ</div><div class="lang-eng">Punjabi</div></div>
+    <div class="lang-card"><div class="lang-native">മലയാളം</div><div class="lang-eng">Malayalam</div></div>
+    <div class="lang-card"><div class="lang-native">ଓଡ଼ିଆ</div><div class="lang-eng">Odia</div></div>
+    <div class="lang-card"><div class="lang-native">English</div><div class="lang-eng">English</div></div>
+  </div>
+</section>
+
+<!-- TELEGRAM BOT PROMO SECTION -->
+<div class="tg-promo">
+  <div class="tg-promo-badge">✈️ Now Available on Telegram</div>
+  <h3>RTI on <span>Telegram</span> — Anytime, Anywhere</h3>
+  <p class="tg-promo-desc">No website needed! Generate RTI applications, download PDF, and track responses — all from your Telegram app. Available in 10+ Indian languages.</p>
+  <div class="tg-features">
+    <div class="tg-feature">📝 <strong>Instant RTI Draft</strong></div>
+    <div class="tg-feature">📄 <strong>PDF Download</strong></div>
+    <div class="tg-feature">🌐 <strong>10+ Languages</strong></div>
+    <div class="tg-feature">🏷️ <strong>12 Categories</strong></div>
+    <div class="tg-feature">🔒 <strong>Private & Secure</strong></div>
+    <div class="tg-feature">⚡ <strong>No Signup</strong></div>
+  </div>
+  <a href="https://t.me/RTIAssistBot" target="_blank" class="tg-btn">✈️ Open RTIAssist Bot on Telegram</a>
+  <div class="tg-btn-sub">Just send /start — it's free!</div>
+</div>
+
+<footer>
+  <div class="footer-top">
+    <!-- Brand Column -->
+    <div class="footer-brand">
+      <div class="footer-brand-logo">🏛 RTI<span>Assist</span></div>
+      <p class="footer-brand-desc">India's most powerful free AI tool to help citizens exercise their Right to Information. 11 languages, 28 states.</p>
+      <div class="footer-social">
+        <a href="https://github.com/shlok926/RTIASSIST-API" target="_blank" title="GitHub">💻</a>
+        <a href="https://t.me/RTIAssistBot" target="_blank" title="Telegram Bot">✈️</a>
+        <a href="https://github.com/shlok926/RTIASSIST-API/discussions" target="_blank" title="Discussions">💬</a>
+        <a href="mailto:support@rtiassist.in" title="Email">📧</a>
+      </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="footer-col">
+      <h4>Features</h4>
+      <a href="#" onclick="showPage('home',null)">🚀 Generate RTI</a>
+      <a href="#" onclick="showPage('tracker',null)">📋 My RTIs</a>
+      <a href="#" onclick="showPage('fees',null)">💰 Fee Calculator</a>
+      <a href="#" onclick="showPage('examples',null)">💡 Examples</a>
+    </div>
+
+    <!-- Resources -->
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <a href="#" onclick="showPage('guide',null)">📖 Filing Guide</a>
+      <a href="#" onclick="showPage('stories',null)">🌟 Success Stories</a>
+      <a href="#" onclick="showPage('about',null)">ℹ️ About Us</a>
+      <a href="https://t.me/RTIAssistBot" target="_blank">✈️ Telegram Bot</a>
+    </div>
+
+    <!-- Official Links -->
+    <div class="footer-col">
+      <h4>Official Portals</h4>
+      <a href="https://rtionline.gov.in" target="_blank">🏛️ RTI Online (Central)</a>
+      <a href="https://rti.gov.in" target="_blank">📜 RTI Act 2005</a>
+      <a href="https://cic.gov.in" target="_blank">⚖️ CIC India</a>
+      <a href="https://github.com/shlok926/RTIASSIST-API/issues" target="_blank">🐛 Report Bug</a>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2026 RTIAssist · Not legal advice · Free for all Indian citizens</div>
+    <div class="footer-badges">
+      <span class="footer-badge">🇮🇳 Made in India</span>
+      <span class="footer-badge">🔒 Privacy First</span>
+      <span class="footer-badge">💚 Open Source</span>
+    </div>
+  </div>
+</footer>
+
+<!-- FLOATING TELEGRAM BUTTON -->
+<a href="https://t.me/RTIAssistBot" target="_blank" class="float-tg" title="Try RTIAssist on Telegram">
+  <span class="tg-icon">✈️</span> Telegram Bot
+</a>
+
+</div><!-- /page home -->
+
+<!-- ══════════ PAGE: MY RTIs TRACKER ══════════ -->
+<div class="page" id="tracker">
+<div class="page-container">
+  <div class="page-title">📋 My RTI Applications</div>
+  <p class="page-sub">Track all your filed RTIs. Search, filter, update status, and export as CSV.</p>
+
+  <div class="tracker-stats" id="trackerStats"></div>
+
+  <div class="search-bar">
+    <input type="text" id="rtiSearchInput" placeholder="🔍 Search by department, description, reference number..." oninput="searchRTIs()"/>
+  </div>
+
+  <div class="filter-row">
+    <button class="filter-btn active" onclick="filterByStatus('all',this)">All</button>
+    <button class="filter-btn" onclick="filterByStatus('filed',this)">📝 Filed</button>
+    <button class="filter-btn" onclick="filterByStatus('pending',this)">⏳ Pending</button>
+    <button class="filter-btn" onclick="filterByStatus('received',this)">✅ Received</button>
+    <button class="filter-btn" onclick="filterByStatus('rejected',this)">❌ Rejected</button>
+    <button class="filter-btn" onclick="filterByStatus('closed',this)">🔒 Closed</button>
+  </div>
+
+  <div id="rtisList"></div>
+  <button class="export-btn" onclick="tracker.exportAsCSV()">⬇️ Export All as CSV</button>
+</div>
+</div>
+
+<!-- ══════════ PAGE: FEES ══════════ -->
+<div class="page" id="fees">
+<div class="page-container">
+  <div class="page-title">💰 RTI Fee Calculator</div>
+  <p class="page-sub">State-wise filing fees, payment modes, and portal links. BPL applicants are always exempt from fees.</p>
+  <div class="bpl-notice">✅ <strong>BPL (Below Poverty Line) applicants</strong> — Zero fee across all states. Attach a copy of your BPL card with the application.</div>
+  <div class="fees-grid" id="feesGrid"></div>
+</div>
+</div>
+
+<!-- ══════════ PAGE: EXAMPLES ══════════ -->
+<div class="page" id="examples">
+<div class="page-container">
+  <div class="page-title">💡 RTI Examples Library</div>
+  <p class="page-sub">Click "Use This" on any example to auto-fill the generator. Based on real RTI scenarios.</p>
+  <div class="ex-cats">
+    <button class="ex-cat-btn active" onclick="filterExamples('all',this)">All</button>
+    <button class="ex-cat-btn" onclick="filterExamples('Food',this)">🍚 Food</button>
+    <button class="ex-cat-btn" onclick="filterExamples('Land',this)">🌾 Land</button>
+    <button class="ex-cat-btn" onclick="filterExamples('Passport',this)">📘 Travel</button>
+    <button class="ex-cat-btn" onclick="filterExamples('Education',this)">🎓 Education</button>
+    <button class="ex-cat-btn" onclick="filterExamples('Pension',this)">👴 Pension</button>
+    <button class="ex-cat-btn" onclick="filterExamples('Municipal',this)">🏙️ Municipal</button>
+    <button class="ex-cat-btn" onclick="filterExamples('Police',this)">🚔 Police</button>
+  </div>
+  <div class="ex-grid" id="examplesGrid"></div>
+</div>
+</div>
+
+<!-- ══════════ PAGE: LEGAL EXAMPLES LIBRARY ══════════ -->
+<div class="page" id="legal-examples">
+<div class="page-container">
+  <button class="back-btn" onclick="showPage('legaltools',null)">← Back to Legal Tools</button>
+  <div class="page-title">⚖️ Legal Examples Library</div>
+  <p class="page-sub">Click "Use This" to auto-fill the form for that tool. Real Indian citizen problems with legal citations.</p>
+  <div class="ex-cats" id="lexCats">
+    <button class="ex-cat-btn active" onclick="filterLegalExamples('all',this)">All</button>
+    <button class="ex-cat-btn" onclick="filterLegalExamples('consumer',this)">🛒 Consumer Court</button>
+    <button class="ex-cat-btn" onclick="filterLegalExamples('legal_notice',this)">📜 Legal Notice</button>
+    <button class="ex-cat-btn" onclick="filterLegalExamples('labour',this)">💼 Labour</button>
+    <button class="ex-cat-btn" onclick="filterLegalExamples('second_appeal',this)">📝 Second Appeal</button>
+  </div>
+  <div class="ex-grid" id="legalExGrid"></div>
+</div>
+</div>
+
+<!-- ══════════ PAGE: SETTINGS ══════════ -->
+<div class="page" id="settings">
+<div class="page-container">
+  <div class="page-title">⚙️ Settings & Profile</div>
+  <p class="page-sub">Optional: Save your details to auto-fill RTI applications. All data is stored locally in your browser.</p>
+
+  <div class="settings-container">
+    
+    <!-- Personal Details Section -->
+    <div class="settings-section">
+      <div class="settings-header">
+        <div>
+          <h3 class="settings-title">👤 Personal Details (Optional)</h3>
+          <p class="settings-desc">These details will auto-populate in your RTI drafts to save time. All data stays in your browser only — never sent to any server.</p>
+        </div>
+        <button class="settings-save-btn" onclick="saveSettings()">💾 Save Changes</button>
+      </div>
+      
+      <div class="settings-form">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="userName" placeholder="Your full name as per Aadhaar/official ID"/>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" id="userPhone" placeholder="+91 98765 43210"/>
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="userEmail" placeholder="your.email@example.com"/>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>Complete Address</label>
+          <textarea id="userAddress" rows="3" placeholder="House No., Street Name, Area, Landmark"></textarea>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>City</label>
+            <input type="text" id="userCity" placeholder="Mumbai, Delhi, etc."/>
+          </div>
+          <div class="form-group">
+            <label>PIN Code</label>
+            <input type="text" id="userPincode" placeholder="400001"/>
+          </div>
+          <div class="form-group">
+            <label>State</label>
+            <input type="text" id="userState" placeholder="Maharashtra, Delhi, etc."/>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Privacy Notice -->
+    <div class="settings-notice">
+      <div class="notice-icon">🔒</div>
+      <div>
+        <div class="notice-title">Your Privacy is Protected</div>
+        <div class="notice-text">✅ All data stored locally in browser (localStorage)<br/>✅ NO server upload — your information never leaves your device<br/>✅ You can clear anytime using "Clear All Data" button<br/>✅ RTIAssist doesn't collect, track, or store any personal information</div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="settings-actions">
+      <button class="settings-action-btn btn-clear" onclick="clearSettings()">🗑️ Clear All Data</button>
+      <button class="settings-action-btn btn-export" onclick="exportSettings()">📤 Export Settings (JSON)</button>
+      <button class="settings-action-btn btn-import" onclick="document.getElementById('importFile').click()">📥 Import Settings</button>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importSettings(event)"/>
+    </div>
+
+    <!-- About Section -->
+    <div class="settings-section">
+      <h3 class="settings-title">ℹ️ About RTIAssist</h3>
+      <div class="about-content">
+        <p><strong>Version:</strong> 2.0 (March 2026)</p>
+        <p><strong>Project:</strong> Open Source RTI Tool for Indian Citizens</p>
+        <p><strong>AI Technology:</strong> Advanced Multi-Layer Reasoning Pipeline</p>
+        <p><strong>License:</strong> Free & Open Source (MIT)</p>
+        <p><strong>Support:</strong> GitHub Issues & Community Forum</p>
+        <p><strong>Contact:</strong> <a href="mailto:support@rtiassist.in" style="color:var(--saffron-l);text-decoration:none">support@rtiassist.in</a></p>
+        <br/>
+        <a href="https://github.com/shlok926/RTIASSIST-API" target="_blank" class="settings-link">📂 View on GitHub</a>
+        <a href="#" onclick="alert('Privacy Policy: RTIAssist does not collect, store, or share any personal data. All user inputs are processed locally or via encrypted API calls.')" class="settings-link">🔒 Privacy Policy</a>
+        <a href="https://rti.gov.in" target="_blank" class="settings-link">🏛️ Official RTI Act 2005</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- ══════════ PAGE: FILING GUIDE ══════════ -->
+<div class="page" id="guide">
+<div class="page-container">
+  <div class="page-title">📖 Visual Filing Guide</div>
+  <p class="page-sub">Step-by-step illustrated guide to file your RTI application successfully</p>
+
+  <div class="guide-steps">
+    <div class="guide-step">
+      <div class="guide-num">1️⃣</div>
+      <div class="guide-content">
+        <h3 class="guide-title">🎯 Generate Your RTI Draft</h3>
+        <p class="guide-desc">Use RTIAssist to generate your legally correct RTI application in your preferred language. The AI will automatically identify the correct department and PIO.</p>
+        <div class="guide-tips">
+          <div class="guide-tip">✅ Be specific about what information you need</div>
+          <div class="guide-tip">✅ Mention time period and location if relevant</div>
+          <div class="guide-tip">✅ Review the quality score — aim for 70+</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-step">
+      <div class="guide-num">2️⃣</div>
+      <div class="guide-content">
+        <h3 class="guide-title">💰 Arrange Application Fee</h3>
+        <p class="guide-desc">Most states charge ₹10. Get an Indian Postal Order (IPO) or Court Fee Stamp from your nearest post office or court.</p>
+        <div class="guide-tips">
+          <div class="guide-tip">💳 IPO should be in the name of the concerned department</div>
+          <div class="guide-tip">💳 BPL cardholders are exempt — attach BPL card copy</div>
+          <div class="guide-tip">💳 Some states accept online payment via portal</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-step">
+      <div class="guide-num">3️⃣</div>
+      <div class="guide-content">
+        <h3 class="guide-title">📝 Print & Sign Your Application</h3>
+        <p class="guide-desc">Print the generated RTI draft on plain paper. Sign at the bottom with your full name and date.</p>
+        <div class="guide-tips">
+          <div class="guide-tip">🖊️ Use black or blue pen for signature</div>
+          <div class="guide-tip">🖊️ Make 2 copies — one for submission, one for your records</div>
+          <div class="guide-tip">🖊️ Attach IPO/stamp or BPL card copy</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-step">
+      <div class="guide-num">4️⃣</div>
+      <div class="guide-content">
+        <h3 class="guide-title">📬 Submit Application</h3>
+        <p class="guide-desc">Send via registered post or hand-deliver to the PIO office address shown in your generated application.</p>
+        <div class="guide-tips">
+          <div class="guide-tip">📮 Registered Post with Acknowledgement (Track Number)</div>
+          <div class="guide-tip">📮 Speed Post (faster, recommended for urgent matters)</div>
+          <div class="guide-tip">📮 Hand delivery (get receipt with date stamp)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-step">
+      <div class="guide-num">5️⃣</div>
+      <div class="guide-content">
+        <h3 class="guide-title">⏰ Track 30-Day Deadline</h3>
+        <p class="guide-desc">PIO must respond within 30 days (48 hours for life-threatening matters). Use RTIAssist Tracker to monitor.</p>
+        <div class="guide-tips">
+          <div class="guide-tip">📱 Save tracking number from registered post</div>
+          <div class="guide-tip">📱 Add to RTIAssist Tracker with filing date</div>
+          <div class="guide-tip">📱 Check mailbox regularly for response</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-step">
+      <div class="guide-num">6️⃣</div>
+      <div class="guide-content">
+        <h3 class="guide-title">📝 File Appeal if Needed</h3>
+        <p class="guide-desc">If you don't receive a response in 30 days or are unsatisfied, file a First Appeal using RTIAssist's Appeal Generator.</p>
+        <div class="guide-tips">
+          <div class="guide-tip">⚖️ Appeal within 30 days of receiving response (or non-response)</div>
+          <div class="guide-tip">⚖️ No additional fee for appeal</div>
+          <div class="guide-tip">⚖️ Can escalate to State/Central Information Commission later</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="guide-faqs">
+    <h3 class="section-title" style="font-size:1.8rem;margin-top:3rem;margin-bottom:1.5rem;">🤔 Common Questions</h3>
+    
+    <div class="faq-item">
+      <div class="faq-q">❓ Can I file RTI online?</div>
+      <div class="faq-a">Yes! Most government departments accept RTIs via https://rtionline.gov.in. You can type your draft there and pay online. However, some state departments still require postal submission.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">❓ Do I need a lawyer?</div>
+      <div class="faq-a">No! RTI Act is designed for ordinary citizens. You don't need legal representation. RTIAssist ensures your application is legally correct.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">❓ Can they reject my RTI?</div>
+      <div class="faq-a">PIOs can only reject if your query falls under Section 8 exemptions (national security, personal privacy, etc.). RTIAssist checks exemption risk for you. Even if rejected, you have right to appeal.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">❓ What if I don't know which department?</div>
+      <div class="faq-a">Don't worry! RTIAssist's AI automatically identifies the correct department and PIO from your description. The Intent Classifier analyzes 28 states and hundreds of departments.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════ PAGE: SUCCESS STORIES ══════════ -->
+<div class="page" id="stories">
+<div class="page-container">
+  <div class="page-title">🌟 Success Stories</div>
+  <p class="page-sub">Real RTI applications that made a difference — powered by RTIAssist</p>
+
+  <div class="success-grid">
+    <div class="success-card">
+      <div class="success-badge">✅ Resolved</div>
+      <div class="success-category">🍚 Ration Card</div>
+      <h3 class="success-title">2-Year Wait Ended in 30 Days</h3>
+      <p class="success-story">"My ration card application was stuck for 2 years. After filing RTI through RTIAssist asking for application status and responsible officer, I got my ration card within 30 days!"</p>
+      <div class="success-meta">
+        <span class="success-state">📍 Maharashtra</span>
+        <span class="success-time">⏱ Resolved in 30 days</span>
+      </div>
+      <div class="success-impact">Impact: Family of 4 now gets subsidized food grains</div>
+    </div>
+
+    <div class="success-card">
+      <div class="success-badge">✅ Resolved</div>
+      <div class="success-category">💧 Water Supply</div>
+      <h3 class="success-title">6-Month Water Crisis Fixed</h3>
+      <p class="success-story">"Our area had no municipal water for 6 months despite complaints. RTI revealed ₹20 lakh was sanctioned but not used. After filing, supply resumed in 3 weeks."</p>
+      <div class="success-meta">
+        <span class="success-state">📍 Gujarat</span>
+        <span class="success-time">⏱ Resolved in 21 days</span>
+      </div>
+      <div class="success-impact">Impact: 200+ households now have regular water supply</div>
+    </div>
+
+    <div class="success-card">
+      <div class="success-badge">✅ Resolved</div>
+      <div class="success-category">🎓 Scholarship</div>
+      <h3 class="success-title">₹50,000 Scholarship Released</h3>
+      <p class="success-story">"Applied for post-matric scholarship 8 months ago — no response. RTI through RTIAssist showed my application was approved but payment pending. Got ₹50,000 in my account within 2 weeks!"</p>
+      <div class="success-meta">
+        <span class="success-state">📍 Karnataka</span>
+        <span class="success-time">⏱ Resolved in 14 days</span>
+      </div>
+      <div class="success-impact">Impact: Student continued college education</div>
+    </div>
+
+    <div class="success-card">
+      <div class="success-badge">✅ Resolved</div>
+      <div class="success-category">🛣️ Road Construction</div>
+      <h3 class="success-title">₹40 Lakh Road Completed</h3>
+      <p class="success-story">"PMGSY road sanctioned 3 years ago, no work done. RTI revealed contractor took advance but didn't start. District Magistrate ordered completion — road ready in 4 months!"</p>
+      <div class="success-meta">
+        <span class="success-state">📍 Bihar</span>
+        <span class="success-time">⏱ Resolved in 120 days</span>
+      </div>
+      <div class="success-impact">Impact: 5 villages connected to highway</div>
+    </div>
+
+    <div class="success-card">
+      <div class="success-badge">✅ Resolved</div>
+      <div class="success-category">📘 Passport</div>
+      <h3 class="success-title">Police Verification Cleared</h3>
+      <p class="success-story">"Passport stuck at police verification for 7 months. RTI showed verification report was submitted but lost in file. Re-verification ordered, passport delivered in 3 weeks."</p>
+      <div class="success-meta">
+        <span class="success-state">📍 Central Government</span>
+        <span class="success-time">⏱ Resolved in 21 days</span>
+      </div>
+      <div class="success-impact">Impact: Family went for Dubai job opportunity</div>
+    </div>
+
+    <div class="success-card">
+      <div class="success-badge">✅ Resolved</div>
+      <div class="success-category">⚡ Electricity</div>
+      <h3 class="success-title">Overbilling Corrected — ₹18,000 Refund</h3>
+      <p class="success-story">"Electricity bill suddenly jumped from ₹800 to ₹6,000/month. RTI revealed meter reading error. Billing corrected and got ₹18,000 refund for 3 months of overcharging!"</p>
+      <div class="success-meta">
+        <span class="success-state">📍 Madhya Pradesh</span>
+        <span class="success-time">⏱ Resolved in 45 days</span>
+      </div>
+      <div class="success-impact">Impact: ₹18,000 refund + future bills corrected</div>
+    </div>
+  </div>
+
+  <div class="cta-box" style="background:rgba(255,107,0,.08);border:1px solid rgba(255,107,0,.2);border-radius:16px;padding:2rem;text-align:center;margin-top:2.5rem;">
+    <h3 style="font-size:1.5rem;margin-bottom:.75rem;color:var(--saffron-l);">📣 Share Your Success Story</h3>
+    <p style="color:var(--muted);margin-bottom:1.25rem;line-height:1.6;">Did RTIAssist help you get results? Share your story to inspire others!</p>
+    <button onclick="window.open('https://github.com/shlok926/RTIASSIST-API/discussions','_blank')" style="background:linear-gradient(135deg,var(--saffron),var(--saffron-l));border:none;padding:.9rem 2rem;border-radius:10px;color:white;font-weight:700;cursor:pointer;font-size:.95rem;">Share on GitHub Discussions →</button>
+  </div>
+</div>
+</div>
+
+<!-- ══════════ PAGE: ABOUT ══════════ -->
+<div class="page" id="about">
+<div class="page-container">
+  
+  <div class="about-hero">
+    <h2>🏛️ About <span style="color:var(--saffron)">RTIAssist</span></h2>
+    <p>India's most powerful free AI-powered tool to help citizens exercise their fundamental Right to Information under the RTI Act, 2005.</p>
+  </div>
+
+  <!-- Mission Cards -->
+  <div class="about-grid">
+    <div class="about-card">
+      <div class="card-icon">🎯</div>
+      <h4>Our Mission</h4>
+      <p>Empower every Indian citizen to hold the government accountable by making RTI filing simple, fast, and free — in any Indian language.</p>
+    </div>
+    <div class="about-card">
+      <div class="card-icon">💡</div>
+      <h4>Why RTIAssist?</h4>
+      <p>Filing RTI shouldn't require legal expertise. Our AI understands your complaint in plain language and generates a legally-correct application in 30 seconds.</p>
+    </div>
+    <div class="about-card">
+      <div class="card-icon">🌍</div>
+      <h4>Open Source</h4>
+      <p>RTIAssist is 100% free and open source under MIT License. Anyone can contribute, audit, or deploy their own instance.</p>
+    </div>
+  </div>
+
+  <!-- Features Overview -->
+  <h3 class="section-title" style="font-size:1.5rem;margin-bottom:1.5rem;">⚡ What RTIAssist Does</h3>
+  <div class="about-grid" style="margin-bottom:2.5rem;">
+    <div class="about-card">
+      <div class="card-icon">📝</div>
+      <h4>AI Draft Generator</h4>
+      <p>Describe your problem in plain words. AI identifies the right department, PIO, and generates a legally-correct RTI application.</p>
+    </div>
+    <div class="about-card">
+      <div class="card-icon">🌐</div>
+      <h4>11 Indian Languages</h4>
+      <p>Generate RTI in Hindi, English, Marathi, Tamil, Telugu, Kannada, Bengali, Gujarati, Punjabi, Malayalam, or Odia.</p>
+    </div>
+    <div class="about-card">
+      <div class="card-icon">📊</div>
+      <h4>Quality Scoring</h4>
+      <p>Every draft gets a quality score with suggestions to improve. Aim for 70+ for best results.</p>
+    </div>
+    <div class="about-card">
+      <div class="card-icon">⚖️</div>
+      <h4>Exemption Check</h4>
+      <p>Automatically checks Section 8 exemptions so your RTI isn't rejected. Get warnings before filing.</p>
+    </div>
+    <div class="about-card">
+      <div class="card-icon">📋</div>
+      <h4>RTI Tracker</h4>
+      <p>Save, track, and manage all your RTIs in one place. Monitor 30-day deadlines and response status.</p>
+    </div>
+    <div class="about-card">
+      <div class="card-icon">📝</div>
+      <h4>Appeal Generator</h4>
+      <p>If PIO doesn't respond in 30 days, generate a First Appeal letter with one click under Section 19(1).</p>
+    </div>
+  </div>
+
+  <!-- Tech Stack -->
+  <h3 class="section-title" style="font-size:1.5rem;margin-bottom:1.5rem;">🔧 Technology</h3>
+  <div class="tech-stack">
+    <div class="tech-item">
+      <div class="tech-icon">🤖</div>
+      <div class="tech-name">AI Engine</div>
+      <div class="tech-desc">Multi-layer reasoning pipeline</div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-icon">🐍</div>
+      <div class="tech-name">FastAPI</div>
+      <div class="tech-desc">Python backend API</div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-icon">🌐</div>
+      <div class="tech-name">Vanilla JS</div>
+      <div class="tech-desc">No framework needed</div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-icon">🤖</div>
+      <div class="tech-name">Telegram Bot</div>
+      <div class="tech-desc">RTI via Telegram</div>
+    </div>
+  </div>
+
+  <!-- Telegram CTA in About -->
+  <div style="background:linear-gradient(135deg,rgba(0,136,204,.1),rgba(0,136,204,.03));border:1px solid rgba(0,136,204,.2);border-radius:16px;padding:1.5rem;margin-bottom:2.5rem;display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;">
+    <div style="font-size:2.5rem;">✈️</div>
+    <div style="flex:1;min-width:200px;">
+      <h4 style="margin-bottom:.3rem;">Also available on Telegram!</h4>
+      <p style="font-size:.83rem;color:var(--muted);line-height:1.5;">Generate RTI drafts, download PDF, choose from 12 categories — all from Telegram. No website needed.</p>
+    </div>
+    <a href="https://t.me/RTIAssistBot" target="_blank" style="background:linear-gradient(135deg,#0088cc,#00aaff);color:white;padding:.65rem 1.5rem;border-radius:10px;text-decoration:none;font-weight:700;font-size:.88rem;white-space:nowrap;">✈️ Open Bot</a>
+  </div>
+
+  <!-- Privacy Commitment -->
+  <div class="privacy-box">
+    <h3>🔒 Privacy Commitment</h3>
+    <ul class="privacy-list">
+      <li>✅ No personal data is stored on our servers</li>
+      <li>✅ All user settings are saved locally in your browser (localStorage)</li>
+      <li>✅ RTI drafts are generated on-the-fly and not logged</li>
+      <li>✅ No tracking, no analytics, no cookies</li>
+      <li>✅ Open source — audit the code yourself on GitHub</li>
+      <li>✅ No signup or login required</li>
+    </ul>
+  </div>
+
+  <!-- Contact & Support -->
+  <h3 class="section-title" style="font-size:1.5rem;margin-bottom:1.5rem;">📞 Contact & Support</h3>
+  <div class="contact-grid">
+    <a href="mailto:support@rtiassist.in" class="contact-card">
+      <div class="c-icon">📧</div>
+      <div>
+        <div class="c-label">Email</div>
+        <div class="c-value">support@rtiassist.in</div>
+      </div>
+    </a>
+    <a href="https://github.com/shlok926/RTIASSIST-API" target="_blank" class="contact-card">
+      <div class="c-icon">💻</div>
+      <div>
+        <div class="c-label">GitHub</div>
+        <div class="c-value">View Source Code</div>
+      </div>
+    </a>
+    <a href="https://github.com/shlok926/RTIASSIST-API/discussions" target="_blank" class="contact-card">
+      <div class="c-icon">💬</div>
+      <div>
+        <div class="c-label">Community</div>
+        <div class="c-value">GitHub Discussions</div>
+      </div>
+    </a>
+    <a href="https://github.com/shlok926/RTIASSIST-API/issues" target="_blank" class="contact-card">
+      <div class="c-icon">🐛</div>
+      <div>
+        <div class="c-label">Report Bug</div>
+        <div class="c-value">GitHub Issues</div>
+      </div>
+    </a>
+  </div>
+
+  <!-- Legal Disclaimer -->
+  <div style="margin-top:2.5rem;background:rgba(212,160,23,.06);border:1px solid rgba(212,160,23,.2);border-radius:16px;padding:1.5rem;">
+    <h4 style="color:var(--gold);margin-bottom:.5rem;">⚠️ Legal Disclaimer</h4>
+    <p style="font-size:.83rem;color:var(--muted);line-height:1.7;">RTIAssist is a free tool that helps generate RTI applications. It is <strong style="color:var(--text)">not legal advice</strong>. The generated drafts should be reviewed before submission. We are not affiliated with any government body. The Right to Information Act, 2005 is a law enacted by the Parliament of India, and RTIAssist simply helps citizens exercise this right more effectively.</p>
+  </div>
+
+</div>
+</div>
+
+<!-- ══════════ PAGE: LEGAL TOOLS HUB ══════════ -->
+<div class="page" id="legaltools">
+<div class="page-container">
+  <div class="page-title">⚖️ Legal Tools</div>
+  <p class="page-sub">Free AI-powered legal document generators — no lawyer needed</p>
+
+  <div class="tools-grid">
+    <div class="tool-entry-card" onclick="showPage('second-appeal',null)">
+      <div class="tec-icon">📝</div>
+      <div class="tec-title">Second Appeal (CIC)</div>
+      <div class="tec-desc">First Appeal rejected? File a Second Appeal to Central Information Commission — free, auto-generated, legally correct.</div>
+      <span class="tec-tag">🏆 Highest Impact</span>
+    </div>
+    <div class="tool-entry-card" onclick="showPage('consumer-court',null)">
+      <div class="tec-icon">🛒</div>
+      <div class="tec-title">Consumer Court Complaint</div>
+      <div class="tec-desc">Product defective, refund denied? File complaint to Consumer Forum via EDAAKHIL portal — AI generates perfect format.</div>
+      <span class="tec-tag orange">40L+ Pending Cases</span>
+    </div>
+    <div class="tool-entry-card" onclick="showPage('legal-notice',null)">
+      <div class="tec-icon">📜</div>
+      <div class="tec-title">Legal Notice Generator</div>
+      <div class="tec-desc">Landlord not returning deposit? Builder delayed? Send a legal notice under specific IPC/CPC sections. Lawyers charge ₹2000-5000, we do it free.</div>
+      <span class="tec-tag orange">₹500Cr Market</span>
+    </div>
+    <div class="tool-entry-card" onclick="showPage('labour-complaint',null)">
+      <div class="tec-icon">💼</div>
+      <div class="tec-title">Labour Complaint</div>
+      <div class="tec-desc">Salary not paid? Fired without notice? PF not deducted? File formal complaint to Labour Commissioner.</div>
+      <span class="tec-tag">10Cr+ Workers</span>
+    </div>
+    <div class="tool-entry-card" style="opacity:.6;cursor:default;">
+      <div class="tec-icon">🏘️</div>
+      <div class="tec-title">Gram Panchayat Complaint</div>
+      <div class="tec-desc">MNREGA funds misused? Road/nali not built? File formal complaint to District Collector.</div>
+      <span class="tec-tag">Coming Soon</span>
+    </div>
+    <div class="tool-entry-card" style="opacity:.6;cursor:default;">
+      <div class="tec-icon">🔍</div>
+      <div class="tec-title">Tender Objection (CVC)</div>
+      <div class="tec-desc">Government tender irregularity? File CVC complaint + RTI for tender documents combo.</div>
+      <span class="tec-tag">Coming Soon</span>
+    </div>
+  </div>
+
+  <div style="background:rgba(0,107,63,.06);border:1px solid rgba(0,107,63,.2);border-radius:14px;padding:1.5rem;text-align:center;">
+    <p style="color:var(--muted);font-size:.88rem;line-height:1.7;">All tools are <strong style="color:var(--green-l)">100% FREE</strong>. No signup. No hidden charges. Lawyers charge ₹2000-15000 for these documents — we generate them in 30 seconds.</p>
+  </div>
+  <div style="margin-top:1.2rem;text-align:center;">
+    <button class="quick-action-btn qa-secondary" onclick="showPage('legal-examples',null)">💡 Browse Legal Examples Library →</button>
+  </div>
+</div>
+</div>
+
+<!-- ══════════ PAGE: SECOND APPEAL (CIC) ══════════ -->
+<div class="page" id="second-appeal">
+<div class="page-container">
+  <button class="back-btn" onclick="showPage('legaltools',null)">← Back to Legal Tools</button>
+  
+  <div class="tool-hero">
+    <div class="tool-hero-icon">📝</div>
+    <div>
+      <div class="tool-hero-title">Second Appeal — Central Information Commission</div>
+      <p class="tool-hero-desc">First Appeal rejected or ignored? File a Second Appeal to CIC under Section 19(3) of RTI Act 2005. Lawyers charge ₹5000-15000 for this — we generate it FREE in 30 seconds.</p>
+      <div class="tool-hero-badges">
+        <span class="tool-hero-badge">✅ Section 19(3) RTI Act 2005</span>
+        <span class="tool-hero-badge">✅ CIC Format</span>
+        <span class="tool-hero-badge">✅ No Fee Required</span>
+        <span class="tool-hero-badge">✅ PDF Download</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="tool-card">
+    <div class="form-group">
+      <label>Your Full Name *</label>
+      <input type="text" id="cic-name" placeholder="As per original RTI application"/>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Original RTI Application Date *</label>
+        <input type="date" id="cic-rti-date"/>
+      </div>
+      <div class="form-group">
+        <label>First Appeal Date *</label>
+        <input type="date" id="cic-appeal-date"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Public Authority / Department *</label>
+      <input type="text" id="cic-dept" placeholder="e.g. Ministry of Health, Food Dept Maharashtra"/>
+    </div>
+    <span class="ex-lbl">💡 Common scenarios — click to fill:</span>
+    <div class="chips">
+      <div class="chip" onclick="setLegalEx('second_appeal',0)">⏳ PIO No Reply</div>
+      <div class="chip" onclick="setLegalEx('second_appeal',1)">🚫 FAA Also Ignored</div>
+      <div class="chip" onclick="setLegalEx('second_appeal',2)">❌ Wrong Exemption Cited</div>
+      <div class="chip" onclick="setLegalEx('second_appeal',3)">🏛️ State Dept (SIC)</div>
+      <div class="chip" onclick="setLegalEx('second_appeal',4)">📁 Record Claimed Missing</div>
+    </div>
+    <div class="form-group">
+      <label>Describe Your Original RTI Query *</label>
+      <textarea id="cic-query" placeholder="What information did you originally request? Be specific..." style="min-height:90px"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Why Was First Appeal Unsatisfactory?</label>
+      <select id="cic-reason">
+        <option value="no_response">First Appeal — No response received</option>
+        <option value="incomplete">Information provided was incomplete</option>
+        <option value="denied">Information denied without valid Section 8 reason</option>
+        <option value="wrong_info">Wrong/incorrect information provided</option>
+        <option value="partial">Only partial information given</option>
+        <option value="delay">Responded after 30-day deadline</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Additional Details (optional)</label>
+      <textarea id="cic-details" placeholder="Any other relevant facts, evidence, or context..." style="min-height:70px"></textarea>
+    </div>
+    <button class="submit-btn" onclick="generateCICAppeal()" id="cicBtn">
+      <div class="spinner"></div>
+      <span class="btn-text">⚡ Generate Second Appeal — FREE</span>
+    </button>
+    <div class="err-box" id="cicError"></div>
+
+    <div class="tool-result" id="cicResult">
+      <div class="tool-output" id="cicDraft"></div>
+      <div class="tool-action-btns">
+        <button class="tool-action-btn tab-copy" onclick="copyToolDraft('cicDraft',this)">📋 Copy</button>
+        <button class="tool-action-btn tab-dl" onclick="downloadToolPDF('cicDraft','Second_Appeal_CIC')">📄 Download PDF</button>
+        <a href="https://cic.gov.in/online-appeal" target="_blank" class="tool-action-btn tab-share" style="text-decoration:none">🌐 File on CIC Portal</a>
+      </div>
+      <div class="tool-disclaimer"><strong>⚠️ Note:</strong> File this within 90 days of receiving First Appeal response (or non-response). Send to: Registrar, Central Information Commission, August Kranti Bhawan, Bhikaji Cama Place, New Delhi - 110066. No filing fee for Second Appeal.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════ PAGE: CONSUMER COURT ══════════ -->
+<div class="page" id="consumer-court">
+<div class="page-container">
+  <button class="back-btn" onclick="showPage('legaltools',null)">← Back to Legal Tools</button>
+
+  <div class="tool-hero">
+    <div class="tool-hero-icon">🛒</div>
+    <div>
+      <div class="tool-hero-title">Consumer Court Complaint</div>
+      <p class="tool-hero-desc">Product defective? Service not delivered? Company refusing refund? File complaint to Consumer Disputes Redressal Forum under Consumer Protection Act 2019. No lawyer needed.</p>
+      <div class="tool-hero-badges">
+        <span class="tool-hero-badge">✅ Consumer Protection Act 2019</span>
+        <span class="tool-hero-badge">✅ EDAAKHIL Format</span>
+        <span class="tool-hero-badge">✅ District/State/National Forum</span>
+        <span class="tool-hero-badge">✅ Compensation Claim</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="tool-card">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Your Full Name *</label>
+        <input type="text" id="cc-name" placeholder="Complainant name"/>
+      </div>
+      <div class="form-group">
+        <label>Your Address *</label>
+        <input type="text" id="cc-address" placeholder="Full address with pin code"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Company / Opposite Party *</label>
+      <input type="text" id="cc-company" placeholder="e.g. Amazon India, Flipkart, Builder XYZ, Hospital ABC"/>
+    </div>
+    <div class="form-group">
+      <label>Type of Complaint *</label>
+      <select id="cc-type">
+        <option value="defective_product">Defective Product</option>
+        <option value="service_deficiency">Deficiency in Service</option>
+        <option value="refund_denied">Refund/Return Denied</option>
+        <option value="misleading_ad">Misleading Advertisement</option>
+        <option value="overcharging">Overcharging / Unfair Trade Practice</option>
+        <option value="builder_delay">Builder Delay / RERA Matter</option>
+        <option value="insurance_claim">Insurance Claim Rejected</option>
+        <option value="bank_issue">Bank / Financial Service Issue</option>
+        <option value="medical_negligence">Medical Negligence</option>
+      </select>
+    </div>
+    <span class="ex-lbl">💡 Common problems — click to fill:</span>
+    <div class="chips">
+      <div class="chip" onclick="setLegalEx('consumer',0)">🛒 Ecomm Refund</div>
+      <div class="chip" onclick="setLegalEx('consumer',1)">🏦 Insurance Claim</div>
+      <div class="chip" onclick="setLegalEx('consumer',2)">🏠 Builder Delay</div>
+      <div class="chip" onclick="setLegalEx('consumer',3)">💳 Bank Fraud</div>
+      <div class="chip" onclick="setLegalEx('consumer',4)">📶 Telecom Bill</div>
+      <div class="chip" onclick="setLegalEx('consumer',5)">📱 Defective Product</div>
+      <div class="chip" onclick="setLegalEx('consumer',6)">🏥 Hospital Bill</div>
+      <div class="chip" onclick="setLegalEx('consumer',7)">📚 Course Refund</div>
+    </div>
+    <div class="form-group">
+      <label>Describe the Problem in Detail *</label>
+      <textarea id="cc-desc" placeholder="What happened? Order ID, dates, amount paid, what the company did wrong, what response you got when you complained to them..." style="min-height:110px"></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Amount Involved (₹)</label>
+        <input type="text" id="cc-amount" placeholder="e.g. 15000"/>
+      </div>
+      <div class="form-group">
+        <label>Date of Purchase/Service</label>
+        <input type="date" id="cc-date"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Relief Sought</label>
+      <select id="cc-relief">
+        <option value="refund">Full Refund</option>
+        <option value="replacement">Product Replacement</option>
+        <option value="compensation">Compensation for Loss</option>
+        <option value="service_completion">Service Completion</option>
+        <option value="all">Refund + Compensation + Legal Costs</option>
+      </select>
+    </div>
+    <button class="submit-btn" onclick="generateConsumerComplaint()" id="ccBtn">
+      <div class="spinner"></div>
+      <span class="btn-text">⚡ Generate Consumer Complaint — FREE</span>
+    </button>
+    <div class="err-box" id="ccError"></div>
+
+    <div class="tool-result" id="ccResult">
+      <div class="tool-output" id="ccDraft"></div>
+      <div class="tool-action-btns">
+        <button class="tool-action-btn tab-copy" onclick="copyToolDraft('ccDraft',this)">📋 Copy</button>
+        <button class="tool-action-btn tab-dl" onclick="downloadToolPDF('ccDraft','Consumer_Complaint')">📄 Download PDF</button>
+        <a href="https://edaakhil.nic.in" target="_blank" class="tool-action-btn tab-share" style="text-decoration:none">🌐 File on EDAAKHIL Portal</a>
+      </div>
+      <div class="tool-disclaimer"><strong>⚠️ Note:</strong> File at District Consumer Forum for claims up to ₹1 crore. Claims ₹1Cr-₹10Cr → State Commission. Above ₹10Cr → National Commission. No court fees for claims below ₹5 lakh.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════ PAGE: LEGAL NOTICE ══════════ -->
+<div class="page" id="legal-notice">
+<div class="page-container">
+  <button class="back-btn" onclick="showPage('legaltools',null)">← Back to Legal Tools</button>
+
+  <div class="tool-hero">
+    <div class="tool-hero-icon">📜</div>
+    <div>
+      <div class="tool-hero-title">Legal Notice Generator</div>
+      <p class="tool-hero-desc">Landlord not returning deposit? Builder delaying possession? Employer not paying dues? Send a formal legal notice under relevant IPC/CPC sections. Advocates charge ₹2000-5000 — we do it FREE.</p>
+      <div class="tool-hero-badges">
+        <span class="tool-hero-badge">✅ IPC / CPC Sections Auto-Cited</span>
+        <span class="tool-hero-badge">✅ 15-Day Compliance Deadline</span>
+        <span class="tool-hero-badge">✅ Registered Post Format</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="tool-card">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Your Name (Sender) *</label>
+        <input type="text" id="ln-sender" placeholder="Your full name"/>
+      </div>
+      <div class="form-group">
+        <label>Recipient Name *</label>
+        <input type="text" id="ln-recipient" placeholder="Person / Company name"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Type of Legal Notice *</label>
+      <select id="ln-type">
+        <option value="rent_deposit">Landlord — Security Deposit Not Returned</option>
+        <option value="property_dispute">Property / Land Dispute</option>
+        <option value="builder_delay">Builder — Possession Delay</option>
+        <option value="money_recovery">Money Recovery (Loan/Dues)</option>
+        <option value="cheque_bounce">Cheque Bounce (NI Act Section 138)</option>
+        <option value="employment">Employer — Unpaid Salary / Wrongful Termination</option>
+        <option value="defamation">Defamation / False Statements</option>
+        <option value="contract_breach">Contract Breach</option>
+        <option value="family_maintenance">Family Maintenance (Sec 125 CrPC)</option>
+      </select>
+    </div>
+    <span class="ex-lbl">💡 Common cases — click to fill:</span>
+    <div class="chips">
+      <div class="chip" onclick="setLegalEx('legal_notice',0)">🏠 Security Deposit</div>
+      <div class="chip" onclick="setLegalEx('legal_notice',1)">🏗️ Builder Possession</div>
+      <div class="chip" onclick="setLegalEx('legal_notice',2)">💼 Salary Dues</div>
+      <div class="chip" onclick="setLegalEx('legal_notice',3)">💵 Cheque Bounce</div>
+      <div class="chip" onclick="setLegalEx('legal_notice',4)">🌾 Property Dispute</div>
+      <div class="chip" onclick="setLegalEx('legal_notice',5)">💰 Loan Recovery</div>
+      <div class="chip" onclick="setLegalEx('legal_notice',6)">📋 Contract Breach</div>
+      <div class="chip" onclick="setLegalEx('legal_notice',7)">🗣️ Defamation</div>
+    </div>
+    <div class="form-group">
+      <label>Describe the Issue in Detail *</label>
+      <textarea id="ln-desc" placeholder="Full details: what happened, dates, amounts, previous attempts to resolve, what the other party did/didn't do..." style="min-height:110px"></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Amount Involved (₹) if applicable</label>
+        <input type="text" id="ln-amount" placeholder="e.g. 50000"/>
+      </div>
+      <div class="form-group">
+        <label>State</label>
+        <select id="ln-state">
+          <option value="">Select State</option>
+          <option>Delhi</option><option>Maharashtra</option><option>Karnataka</option>
+          <option>Tamil Nadu</option><option>Uttar Pradesh</option><option>Gujarat</option>
+          <option>Rajasthan</option><option>West Bengal</option><option>Telangana</option>
+          <option>Kerala</option><option>Punjab</option><option>Haryana</option>
+        </select>
+      </div>
+    </div>
+    <button class="submit-btn" onclick="generateLegalNotice()" id="lnBtn">
+      <div class="spinner"></div>
+      <span class="btn-text">⚡ Generate Legal Notice — FREE</span>
+    </button>
+    <div class="err-box" id="lnError"></div>
+
+    <div class="tool-result" id="lnResult">
+      <div class="tool-output" id="lnDraft"></div>
+      <div class="tool-action-btns">
+        <button class="tool-action-btn tab-copy" onclick="copyToolDraft('lnDraft',this)">📋 Copy</button>
+        <button class="tool-action-btn tab-dl" onclick="downloadToolPDF('lnDraft','Legal_Notice')">📄 Download PDF</button>
+      </div>
+      <div class="tool-disclaimer"><strong>⚠️ Note:</strong> Send via Registered Post with Acknowledgement Due (RPAD). Keep proof of dispatch. If no response in 15 days, you may proceed with court filing. This is not a substitute for legal counsel in complex matters.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════ PAGE: LABOUR COMPLAINT ══════════ -->
+<div class="page" id="labour-complaint">
+<div class="page-container">
+  <button class="back-btn" onclick="showPage('legaltools',null)">← Back to Legal Tools</button>
+
+  <div class="tool-hero">
+    <div class="tool-hero-icon">💼</div>
+    <div>
+      <div class="tool-hero-title">Labour Complaint Generator</div>
+      <p class="tool-hero-desc">Boss ne salary nahi di? Bina notice ke nikaala? PF/ESI nahi kata? File formal complaint to Labour Commissioner / Industrial Tribunal — legally enforceable.</p>
+      <div class="tool-hero-badges">
+        <span class="tool-hero-badge">✅ Industrial Disputes Act 1947</span>
+        <span class="tool-hero-badge">✅ Payment of Wages Act</span>
+        <span class="tool-hero-badge">✅ PF Act / ESI Act</span>
+        <span class="tool-hero-badge">✅ Labour Commissioner Format</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="tool-card">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Employee Name *</label>
+        <input type="text" id="lc-name" placeholder="Your full name"/>
+      </div>
+      <div class="form-group">
+        <label>Employer / Company Name *</label>
+        <input type="text" id="lc-employer" placeholder="Company/employer name"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Type of Complaint *</label>
+      <select id="lc-type">
+        <option value="salary_unpaid">Salary Not Paid / Withheld</option>
+        <option value="wrongful_termination">Wrongful Termination (Without Notice)</option>
+        <option value="pf_not_deposited">PF/EPF Not Deposited</option>
+        <option value="esi_not_provided">ESI / Medical Benefits Not Given</option>
+        <option value="overtime_unpaid">Overtime Not Paid</option>
+        <option value="forced_resignation">Forced Resignation / Harassment</option>
+        <option value="gratuity_denied">Gratuity Not Paid</option>
+        <option value="contract_violation">Contract/Offer Letter Violated</option>
+        <option value="work_conditions">Unsafe/Hazardous Work Conditions</option>
+      </select>
+    </div>
+    <span class="ex-lbl">💡 Common complaints — click to fill:</span>
+    <div class="chips">
+      <div class="chip" onclick="setLegalEx('labour',0)">💸 Salary Not Paid</div>
+      <div class="chip" onclick="setLegalEx('labour',1)">📊 PF Not Deposited</div>
+      <div class="chip" onclick="setLegalEx('labour',2)">🚫 Wrongful Termination</div>
+      <div class="chip" onclick="setLegalEx('labour',3)">📄 No Appointment Letter</div>
+      <div class="chip" onclick="setLegalEx('labour',4)">⏰ Overtime Not Paid</div>
+      <div class="chip" onclick="setLegalEx('labour',5)">🏥 ESIC Not Given</div>
+      <div class="chip" onclick="setLegalEx('labour',6)">🎁 Gratuity Denied</div>
+      <div class="chip" onclick="setLegalEx('labour',7)">🤱 Maternity Benefit</div>
+    </div>
+    <div class="form-group">
+      <label>Describe the Problem *</label>
+      <textarea id="lc-desc" placeholder="Details: designation, joining date, last working date, amount owed, what happened, evidence you have (salary slips, messages, etc.)..." style="min-height:110px"></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Amount Owed (₹) if applicable</label>
+        <input type="text" id="lc-amount" placeholder="e.g. 45000"/>
+      </div>
+      <div class="form-group">
+        <label>State *</label>
+        <select id="lc-state">
+          <option value="">Select State</option>
+          <option>Delhi</option><option>Maharashtra</option><option>Karnataka</option>
+          <option>Tamil Nadu</option><option>Uttar Pradesh</option><option>Gujarat</option>
+          <option>Rajasthan</option><option>West Bengal</option><option>Telangana</option>
+          <option>Kerala</option><option>Punjab</option><option>Haryana</option>
+          <option>Bihar</option><option>Madhya Pradesh</option><option>Andhra Pradesh</option>
+        </select>
+      </div>
+    </div>
+    <button class="submit-btn" onclick="generateLabourComplaint()" id="lcBtn">
+      <div class="spinner"></div>
+      <span class="btn-text">⚡ Generate Labour Complaint — FREE</span>
+    </button>
+    <div class="err-box" id="lcError"></div>
+
+    <div class="tool-result" id="lcResult">
+      <div class="tool-output" id="lcDraft"></div>
+      <div class="tool-action-btns">
+        <button class="tool-action-btn tab-copy" onclick="copyToolDraft('lcDraft',this)">📋 Copy</button>
+        <button class="tool-action-btn tab-dl" onclick="downloadToolPDF('lcDraft','Labour_Complaint')">📄 Download PDF</button>
+      </div>
+      <div class="tool-disclaimer"><strong>⚠️ Note:</strong> Submit to the Labour Commissioner's office of your district. Bring original documents (offer letter, salary slips, bank statements). For PF issues, you can also directly complain on <a href="https://epfindia.gov.in" target="_blank" style="color:var(--saffron-l)">EPFO portal</a>.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- APPEAL MODAL -->
+<div class="modal-overlay" id="appealModal">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <div class="modal-ttl">📝 First Appeal Letter</div>
+      <button class="modal-close" onclick="closeAppealModal()">✕</button>
+    </div>
+    <p class="modal-desc">File this if the PIO does not respond within 30 days (or gives unsatisfactory response). Send to the First Appellate Authority under Section 19(1) of RTI Act 2005.</p>
+    <div class="modal-draft" id="appealDraft"></div>
+    <div class="modal-btns">
+      <button class="mbtn mbtn-copy" onclick="copyAppeal()">📋 Copy Appeal</button>
+      <button class="mbtn mbtn-dl" onclick="downloadAppeal()">⬇️ Download</button>
+    </div>
+  </div>
+</div>
+
+<!-- RTI DETAIL MODAL -->
+<div class="rti-modal" id="rtiDetailsModal">
+  <div class="rti-modal-box">
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════
+const API_BASE = 'http://localhost:7860';
+
+const STATE_PORTALS = {
+  '':{ name:'RTI Online — Central Govt', url:'https://rtionline.gov.in', desc:'Official Central Government RTI portal' },
+  'Delhi':{ name:'Delhi RTI Portal', url:'https://rti.delhi.gov.in', desc:'Delhi Govt RTI filing portal' },
+  'Kerala':{ name:'Kerala RTI Portal', url:'https://rtiportal.kerala.gov.in', desc:'Kerala Govt RTI portal' },
+  'Uttar Pradesh':{ name:'UP RTI Portal', url:'https://rtionline.up.gov.in', desc:'Uttar Pradesh RTI portal' },
+};
+function getPortal(s){ return STATE_PORTALS[s] || STATE_PORTALS['']; }
+
+// ══════════════════════════════════════════════
+// RTI TRACKER CLASS
+// ══════════════════════════════════════════════
+class RTITracker {
+  constructor(){ this.key='rti_applications'; if(!localStorage.getItem(this.key)) localStorage.setItem(this.key,JSON.stringify([])); }
+  getAllRTIs(){ try{ return JSON.parse(localStorage.getItem(this.key))||[]; }catch(e){ return []; } }
+  getRTIById(id){ return this.getAllRTIs().find(r=>r.id===id)||null; }
+  getRTIsByStatus(s){ return this.getAllRTIs().filter(r=>r.status===s); }
+  searchRTIs(q){ const lq=q.toLowerCase(); return this.getAllRTIs().filter(r=>r.description.toLowerCase().includes(lq)||r.department.toLowerCase().includes(lq)||(r.referenceNumber||'').toLowerCase().includes(lq)); }
+  addRTI(d){
+    const rtis=this.getAllRTIs();
+    const r={ id:'RTI_'+Date.now(), description:d.description||'', department:d.department||'Unknown', ministry:d.ministry||'Unknown', state:d.state||'Central', filedDate:new Date().toISOString().slice(0,10), referenceNumber:d.referenceNumber||'', postNumber:'', status:'filed', quality_score:d.quality_score||0, draft:d.draft||'', notes:'', dueDate:this.calcDue(), responses:[], createdAt:new Date().toISOString() };
+    rtis.push(r); localStorage.setItem(this.key,JSON.stringify(rtis)); return r;
+  }
+  updateStatus(id,s){ const rtis=this.getAllRTIs(); const r=rtis.find(x=>x.id===id); if(r){ r.status=s; r.lastUpdated=new Date().toISOString(); localStorage.setItem(this.key,JSON.stringify(rtis)); } return r||null; }
+  updateRef(id,v){ const rtis=this.getAllRTIs(); const r=rtis.find(x=>x.id===id); if(r){ r.referenceNumber=v; localStorage.setItem(this.key,JSON.stringify(rtis)); } }
+  updateNotes(id,v){ const rtis=this.getAllRTIs(); const r=rtis.find(x=>x.id===id); if(r){ r.notes=v; localStorage.setItem(this.key,JSON.stringify(rtis)); } }
+  deleteRTI(id){ const rtis=this.getAllRTIs().filter(r=>r.id!==id); localStorage.setItem(this.key,JSON.stringify(rtis)); return true; }
+  calcDue(){ const d=new Date(); d.setDate(d.getDate()+30); return d.toISOString().slice(0,10); }
+  getDaysLeft(dueDate){ return Math.max(0,Math.ceil((new Date(dueDate)-new Date())/(1000*60*60*24))); }
+  isOverdue(dueDate){ return new Date()>new Date(dueDate); }
+  getStats(){ const rtis=this.getAllRTIs(); return { total:rtis.length, filed:rtis.filter(r=>r.status==='filed').length, received:rtis.filter(r=>r.status==='received').length, overdue:rtis.filter(r=>this.isOverdue(r.dueDate)&&r.status==='filed').length, closed:rtis.filter(r=>r.status==='closed').length }; }
+  statusColor(s){ return {filed:'#FF6B00',pending:'#D4A017',received:'#00A86B',closed:'#8892A4',rejected:'#FF4444'}[s]||'#8892A4'; }
+  statusEmoji(s){ return {filed:'📝',pending:'⏳',received:'✅',closed:'🔒',rejected:'❌'}[s]||'❓'; }
+  exportAsCSV(){
+    const rtis=this.getAllRTIs();
+    let csv='ID,Department,State,Status,Filed,Due,Reference\n';
+    rtis.forEach(r=>{ csv+=`"${r.id}","${r.department}","${r.state}","${r.status}","${r.filedDate}","${r.dueDate}","${r.referenceNumber}"\n`; });
+    const b=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`RTI_Export_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  }
+}
+const tracker = new RTITracker();
+
+// ══════════════════════════════════════════════
+// PAGE NAVIGATION
+// ══════════════════════════════════════════════
+function showPage(name, btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(name).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  // Close mobile menu on page switch
+  const nb = document.getElementById('navButtons');
+  if(nb) nb.classList.remove('mobile-open');
+  window.scrollTo(0,0);
+  if(name==='tracker') renderTracker();
+  if(name==='fees') renderFees();
+  if(name==='examples') renderExamples('all');
+  if(name==='legal-examples') renderLegalExamples('all');
+}
+
+// HAMBURGER TOGGLE
+function toggleMobileMenu(){
+  const nb = document.getElementById('navButtons');
+  if(nb) nb.classList.toggle('mobile-open');
+}
+
+// ══════════════════════════════════════════════
+// LANGUAGE SELECTION
+// ══════════════════════════════════════════════
+let selLangVal = 'english';
+function selLang(btn, lang){
+  document.querySelectorAll('.lbtn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  selLangVal = lang;
+}
+
+// ══════════════════════════════════════════════
+// QUICK EXAMPLES
+// ══════════════════════════════════════════════
+const EX = {
+  ration:{ d:"My ration card application was rejected 3 months ago without any written reason. I want to know the exact grounds for rejection and the name and designation of the officer who rejected it.", s:"Maharashtra" },
+  passport:{ d:"My passport application has been pending for 6 months without any update. I want to know the current status, reason for delay, and responsible officer.", s:"" },
+  pension:{ d:"My old age pension has not been credited to my account for the last 3 months without any prior notice. I urgently need to know the reason and the officer responsible.", s:"Rajasthan" },
+  land:{ d:"My land mutation application at the Tehsildar office has been pending for 8 months. I want to know the current status, reason for delay, and name of responsible officer.", s:"Uttar Pradesh" },
+  scholarship:{ d:"I applied for a government scholarship 6 months ago through the Social Welfare Department but have received no response or disbursement.", s:"Karnataka" },
+  water:{ d:"Despite multiple complaints, the municipal water supply to our area has been irregular for 4 months. I want to know what action has been taken and the timeline for resolution.", s:"Gujarat" },
+  road:{ d:"The PMGSY road sanctioned for our village 2 years ago has not started despite funds being allocated. I want to know the status of funds and reason for delay.", s:"Bihar" },
+  electricity:{ d:"My application for new electricity connection submitted 5 months ago has not been processed. I want to know the status and reason for delay.", s:"Madhya Pradesh" },
+};
+
+function setEx(k){
+  const e=EX[k]; if(!e) return;
+  document.getElementById('description').value=e.d;
+  const sel=document.getElementById('state');
+  for(let i=0;i<sel.options.length;i++){ if(sel.options[i].text===e.s){ sel.selectedIndex=i; break; } }
+  document.getElementById('description').scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function setLegalEx(tool, idx){
+  if(!window.LEGAL_EXAMPLES) return;
+  const examples = LEGAL_EXAMPLES[tool];
+  if(!examples || idx >= examples.length) return;
+  const ex = examples[idx];
+  const fill = (id,val) => { const el=document.getElementById(id); if(el&&val) el.value=val; };
+  const setSelect = (id,val) => { const el=document.getElementById(id); if(!el) return; for(let i=0;i<el.options.length;i++){ if(el.options[i].value===val){el.selectedIndex=i;break;} } };
+  const ccMap = ['refund_denied','insurance_claim','builder_delay','bank_issue','service_deficiency','defective_product','medical_negligence','service_deficiency'];
+  const lnMap = ['rent_deposit','builder_delay','employment','cheque_bounce','property_dispute','money_recovery','contract_breach','defamation'];
+  const lcMap = ['salary_unpaid','pf_not_deposited','wrongful_termination','contract_violation','overtime_unpaid','esi_not_provided','gratuity_denied','forced_resignation'];
+  if(tool==='consumer'){
+    setSelect('cc-type', ccMap[idx]||'service_deficiency');
+    fill('cc-desc', ex.prefill);
+    document.getElementById('cc-desc')?.scrollIntoView({behavior:'smooth',block:'center'});
+  } else if(tool==='legal_notice'){
+    setSelect('ln-type', lnMap[idx]||'money_recovery');
+    fill('ln-desc', ex.prefill);
+    document.getElementById('ln-desc')?.scrollIntoView({behavior:'smooth',block:'center'});
+  } else if(tool==='labour'){
+    setSelect('lc-type', lcMap[idx]||'salary_unpaid');
+    fill('lc-desc', ex.prefill);
+    document.getElementById('lc-desc')?.scrollIntoView({behavior:'smooth',block:'center'});
+  } else if(tool==='second_appeal'){
+    fill('cic-query', ex.prefill);
+    fill('cic-dept', ex.dept);
+    document.getElementById('cic-query')?.scrollIntoView({behavior:'smooth',block:'center'});
+  }
+}
+
+// ══════════════════════════════════════════════
+// GENERATE RTI
+// ══════════════════════════════════════════════
+let lastData = null;
+let countdownInterval = null;
+let deadlineTarget = null;
+
+async function generateRTI(){
+  const desc = document.getElementById('description').value.trim();
+  const state = document.getElementById('state').value;
+  const btn = document.getElementById('submitBtn');
+  const errBox = document.getElementById('errorBox');
+
+  if(!desc || desc.length < 20){ showError('Please describe your problem in at least 20 characters.'); return; }
+
+  btn.disabled=true; btn.classList.add('loading');
+  btn.querySelector('.btn-text').textContent='Analyzing your problem...';
+  errBox.classList.remove('show');
+  document.getElementById('resultSection').classList.remove('show');
+
+  ['s1','s2','s3'].forEach(id=>{ const el=document.getElementById(id); el.classList.remove('active','done'); });
+  document.getElementById('s1').classList.add('active');
+
+  try {
+    document.getElementById('s1').classList.add('done');
+    document.getElementById('s2').classList.add('active');
+    btn.querySelector('.btn-text').textContent='Generating RTI draft...';
+
+    const res = await fetch(`${API_BASE}/rti/generate`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json','ngrok-skip-browser-warning':'true'},
+      body:JSON.stringify({description:desc, language:selLangVal, state:state||null})
+    });
+
+    if(!res.ok){ const err=await res.json().catch(()=>{}); throw new Error(err?.detail||`Server error ${res.status}`); }
+
+    const data = await res.json();
+    lastData = data;
+    lastData._state = state;
+    lastData._desc = desc;
+
+    document.getElementById('s2').classList.add('done');
+    document.getElementById('s3').classList.add('active');
+    renderResult(data, state);
+
+  } catch(e){
+    showError('Error: '+e.message+'. Make sure your RTIAssist server is running and ngrok is active.');
+    document.getElementById('s1').classList.remove('done');
+    document.getElementById('s2').classList.remove('active');
+  } finally {
+    btn.disabled=false; btn.classList.remove('loading');
+    btn.querySelector('.btn-text').textContent='⚡ Generate RTI Application — Free';
+  }
+}
+
+function renderResult(d, state){
+  document.getElementById('resDept').textContent=d.department||'—';
+  document.getElementById('resMinistry').textContent=d.ministry||'—';
+  document.getElementById('resUrgency').textContent=(d.urgency||'—').toUpperCase();
+  document.getElementById('resConf').textContent=d.confidence?Math.round(d.confidence*100)+'%':'—';
+
+  const portal=getPortal(state);
+  document.getElementById('portalLink').href=portal.url;
+  document.getElementById('portalName').textContent='🔗 '+portal.name;
+  document.getElementById('portalDesc').textContent=portal.desc;
+
+  document.getElementById('tagsRow').innerHTML=[
+    `<span class="tag tag-o">🏢 ${d.department}</span>`,
+    `<span class="tag tag-g">🏛 ${d.government_level==='central'?'Central Govt':(d.government_level||'')+' Govt'}</span>`,
+    `<span class="tag tag-y">⚡ ${(d.urgency||'').toUpperCase()}</span>`,
+    state?`<span class="tag tag-b">📍 ${state}</span>`:''
+  ].join('');
+
+  const sc=d.quality_score||0;
+  const sEl=document.getElementById('scoreVal'); sEl.textContent=sc+'/100'; sEl.className='score-val '+(sc>=80?'high':sc>=60?'medium':'low');
+  const su=(d.estimated_success_probability||'medium').toLowerCase();
+  const suEl=document.getElementById('successVal'); suEl.textContent=su.toUpperCase(); suEl.className='score-val '+(su==='high'?'high':su==='medium'?'medium':'low');
+  const rk=(d.exempt_risk||'low').toLowerCase();
+  const rkEl=document.getElementById('riskVal'); rkEl.textContent=rk.toUpperCase(); rkEl.className='score-val '+(rk==='none'||rk==='low'?'high':rk==='medium'?'medium':'low');
+
+  // Deadline countdown
+  const days = d.urgency==='life_threatening'?1:30;
+  startCountdown(days);
+
+  // Auto-populate draft with saved user details
+  let draftText = d.draft || '';
+  const userSettings = getUserSettings();
+  if(userSettings && userSettings.name){
+    const today = new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
+    draftText = draftText
+      .replace('[DATE]', today)
+      .replace('[APPLICANT_NAME]', userSettings.name)
+      .replace('[APPLICANT NAME]', userSettings.name)
+      .replace('[Your Name]', userSettings.name)
+      .replace('[NAME]', userSettings.name)
+      .replace('[COMPLETE ADDRESS]', `${userSettings.address}${userSettings.city?', '+userSettings.city:''}${userSettings.state?', '+userSettings.state:''}${userSettings.pincode?' - '+userSettings.pincode:''}`)
+      .replace('[ADDRESS]', `${userSettings.address}${userSettings.city?', '+userSettings.city:''}${userSettings.state?', '+userSettings.state:''}${userSettings.pincode?' - '+userSettings.pincode:''}`)
+      .replace('[Your Address]', `${userSettings.address}${userSettings.city?', '+userSettings.city:''}${userSettings.state?', '+userSettings.state:''}${userSettings.pincode?' - '+userSettings.pincode:''}`)
+      .replace('[PHONE NUMBER]', userSettings.phone || '[Your Phone Number]')
+      .replace('[PHONE]', userSettings.phone || '[Your Phone Number]')
+      .replace('[Your Phone]', userSettings.phone || '[Your Phone Number]')
+      .replace('[EMAIL ADDRESS]', userSettings.email || '[Your Email]')
+      .replace('[EMAIL]', userSettings.email || '[Your Email]')
+      .replace('[Your Email]', userSettings.email || '[Your Email]')
+      .replace('[PIN CODE]', userSettings.pincode || '[PIN CODE]')
+      .replace('[PINCODE]', userSettings.pincode || '[PINCODE]')
+      .replace('[City]', userSettings.city || '[City]')
+      .replace('[State]', userSettings.state || '[State]');
+  }
+  document.getElementById('draftContent').textContent=draftText;
+
+  const all=[...(d.warnings||[]),...(d.suggestions||[])].filter(Boolean);
+  if(all.length){ document.getElementById('warningsBox').style.display='block'; document.getElementById('warningsList').innerHTML=all.map(w=>`<div class="warn-item">${w}</div>`).join(''); }
+  else document.getElementById('warningsBox').style.display='none';
+
+  document.getElementById('instructionsContent').textContent=d.filing_instructions||'';
+  document.getElementById('resultSection').classList.add('show');
+  setTimeout(()=>document.getElementById('resultSection').scrollIntoView({behavior:'smooth',block:'start'}),100);
+}
+
+// ══════════════════════════════════════════════
+// DEADLINE COUNTDOWN
+// ══════════════════════════════════════════════
+function startCountdown(days){
+  if(countdownInterval) clearInterval(countdownInterval);
+  deadlineTarget = new Date(Date.now()+days*24*60*60*1000);
+  document.getElementById('dlDays').textContent=days;
+  document.getElementById('dlRemain').textContent=days;
+  document.getElementById('dlDeadlineDate').textContent=deadlineTarget.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+  countdownInterval=setInterval(tickCountdown,1000);
+  tickCountdown();
+}
+
+function tickCountdown(){
+  if(!deadlineTarget) return;
+  const diff=deadlineTarget-Date.now();
+  if(diff<=0){ clearInterval(countdownInterval); ['cdD','cdH','cdM'].forEach(id=>document.getElementById(id).textContent='00'); return; }
+  const d=Math.floor(diff/(1000*60*60*24));
+  const h=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+  const m=Math.floor((diff%(1000*60*60))/(1000*60));
+  document.getElementById('cdD').textContent=String(d).padStart(2,'0');
+  document.getElementById('cdH').textContent=String(h).padStart(2,'0');
+  document.getElementById('cdM').textContent=String(m).padStart(2,'0');
+  document.getElementById('dlRemain').textContent=d;
+}
+
+// ══════════════════════════════════════════════
+// SAVE TO TRACKER
+// ══════════════════════════════════════════════
+function saveToTracker(){
+  if(!lastData) return;
+  tracker.addRTI({ description:lastData._desc||lastData.information_needed||'Generated RTI', department:lastData.department, ministry:lastData.ministry, state:lastData._state||'Central', quality_score:lastData.quality_score, draft:lastData.draft });
+  const btn=document.querySelector('.btn-save-tracker');
+  btn.textContent='✅ Saved! Go to My RTIs →';
+  btn.style.background='rgba(0,168,107,.15)';
+  btn.style.borderColor='rgba(0,168,107,.3)';
+  btn.style.color='var(--green-l)';
+  btn.onclick=()=>showPage('tracker',document.querySelectorAll('.nav-btn')[1]);
+  renderTracker();
+}
+
+// ══════════════════════════════════════════════
+// WHATSAPP SHARE
+// ══════════════════════════════════════════════
+function shareWhatsApp(){
+  const draft=document.getElementById('draftContent').textContent;
+  const dept=document.getElementById('resDept').textContent;
+  const msg=`🏛 *RTI Application — ${dept}*\n\n${draft.substring(0,1000)}...\n\n📋 _Generated via RTIAssist — Free AI RTI Generator_\n🌐 File at: https://rtionline.gov.in`;
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+
+// ══════════════════════════════════════════════
+// APPEAL GENERATOR
+// ══════════════════════════════════════════════
+function openAppealModal(){
+  if(!lastData){ alert('Please generate an RTI first.'); return; }
+  const d=lastData;
+  const appealText=`[DATE]\n\nTo:\nThe First Appellate Authority,\n${d.pio_details?.appellate_authority_designation||'First Appellate Authority'},\n${d.department},\n${d.ministry||'Ministry concerned'}\n\nSubject: First Appeal under Section 19(1) of the Right to Information Act, 2005 — against non-response/unsatisfactory response by the Public Information Officer\n\nRespected Sir/Madam,\n\n1. I, [APPLICANT_NAME], had filed an RTI application on [DATE_OF_ORIGINAL_RTI] with the Public Information Officer, ${d.department}, seeking the following information:\n\n   "${d.information_needed||'[Information requested in original RTI]'}"\n\n2. As per Section 7(1) of the RTI Act 2005, the PIO was required to provide information within 30 days of receipt of the application. However, as of today, I have NOT received any response / the response received is incomplete and unsatisfactory.\n\n3. I am therefore filing this First Appeal under Section 19(1) of the RTI Act 2005 and request the Appellate Authority to:\n\n   a) Direct the PIO to provide the complete information immediately;\n   b) Impose a penalty on the defaulting PIO under Section 20(1) for failure to supply information within the prescribed timeframe;\n   c) Award compensation for loss suffered due to non-supply of information.\n\n4. I am attaching a copy of my original RTI application and the postal acknowledgment.\n\nYours faithfully,\n\n[APPLICANT_NAME]\n[COMPLETE ADDRESS]\n[PHONE NUMBER]\n[EMAIL ADDRESS]\n\nDate: [DATE]\n\nEnclosures:\n  1. Copy of original RTI application dated [DATE]\n  2. Postal acknowledgment / delivery proof\n  3. Copy of PIO reply (if any)`;
+
+  document.getElementById('appealDraft').textContent=appealText;
+  document.getElementById('appealModal').classList.add('show');
+}
+
+function closeAppealModal(){ document.getElementById('appealModal').classList.remove('show'); }
+
+function copyAppeal(){
+  navigator.clipboard.writeText(document.getElementById('appealDraft').textContent);
+  const b=document.querySelector('.mbtn-copy'); b.textContent='✅ Copied!'; setTimeout(()=>b.textContent='📋 Copy Appeal',2000);
+}
+
+function downloadAppeal(){
+  const t=document.getElementById('appealDraft').textContent;
+  const b=new Blob([t],{type:'text/plain'}); const a=document.createElement('a');
+  a.href=URL.createObjectURL(b); a.download='RTI_First_Appeal_Letter.txt'; a.click();
+}
+
+// ══════════════════════════════════════════════
+// TRACKER UI
+// ══════════════════════════════════════════════
+function renderTracker(filterStatus=null){
+  const stats=tracker.getStats();
+  document.getElementById('trackerStats').innerHTML=`
+    <div class="tstat"><div class="tstat-n" style="color:var(--saffron)">${stats.total}</div><div class="tstat-l">Total</div></div>
+    <div class="tstat"><div class="tstat-n" style="color:var(--gold)">${stats.filed}</div><div class="tstat-l">Filed</div></div>
+    <div class="tstat"><div class="tstat-n" style="color:var(--green-l)">${stats.received}</div><div class="tstat-l">Received</div></div>
+    <div class="tstat"><div class="tstat-n" style="color:#F87171">${stats.overdue}</div><div class="tstat-l">Overdue</div></div>`;
+
+  const rtis=filterStatus?tracker.getRTIsByStatus(filterStatus):tracker.getAllRTIs();
+  const container=document.getElementById('rtisList');
+  if(!rtis.length){
+    container.innerHTML=`<div class="empty-state"><div class="empty-icon">📭</div>No RTIs ${filterStatus?'with status "'+filterStatus+'"':'yet'}.<br/><span style="font-size:.85rem">Generate an RTI and click "Save to My RTIs Tracker".</span></div>`;
+    return;
+  }
+  container.innerHTML=rtis.map(r=>{
+    const overdue=tracker.isOverdue(r.dueDate)&&r.status==='filed';
+    const dLeft=tracker.getDaysLeft(r.dueDate);
+    const col=tracker.statusColor(r.status);
+    return `<div class="rti-card" onclick="viewRTIDetail('${r.id}')">
+      <div class="rti-card-top">
+        <div>
+          <div class="rti-dept">${r.department}</div>
+          <div class="rti-desc">${(r.description||'').substring(0,90)}...</div>
+        </div>
+        <span class="status-badge" style="background:${col}22;color:${col};border:1px solid ${col}44">${tracker.statusEmoji(r.status)} ${r.status.toUpperCase()}</span>
+      </div>
+      <div class="rti-meta">
+        <span>📅 Filed: ${r.filedDate}</span>
+        <span>⏰ Due: ${r.dueDate}</span>
+        <span>📍 ${r.state}</span>
+        ${r.referenceNumber?`<span>🔖 Ref: ${r.referenceNumber}</span>`:''}
+      </div>
+      ${overdue?`<div class="rti-overdue">⚠️ OVERDUE — ${Math.abs(dLeft)} days past deadline. Consider filing First Appeal.</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function viewRTIDetail(id){
+  const r=tracker.getRTIById(id); if(!r) return;
+  const dLeft=tracker.getDaysLeft(r.dueDate);
+  const overdue=tracker.isOverdue(r.dueDate)&&r.status==='filed';
+  document.getElementById('modalContent').innerHTML=`
+    <div class="modal-header">
+      <div><div class="modal-title">${r.department}</div><div style="color:var(--muted);font-size:.8rem;margin-top:.2rem">${r.state} · ${r.ministry}</div></div>
+      <button class="modal-close-btn" onclick="document.getElementById('rtiDetailsModal').classList.remove('visible')">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.2rem">
+      <div style="background:rgba(0,107,63,.08);padding:.9rem;border-radius:10px"><div class="modal-label">📅 Filed Date</div><div style="color:var(--green-l);font-weight:600">${r.filedDate}</div></div>
+      <div style="background:${overdue?'rgba(248,113,113,.08)':'rgba(212,160,23,.08)'};padding:.9rem;border-radius:10px"><div class="modal-label">⏳ Days Left</div><div style="color:${overdue?'#F87171':'var(--gold)'};font-weight:600">${overdue?'OVERDUE':dLeft+' days'}</div></div>
+    </div>
+    <div class="modal-section"><div class="modal-label">Your Problem</div><div style="background:rgba(255,255,255,.03);padding:.9rem;border-radius:8px;font-size:.85rem;line-height:1.6;color:rgba(255,255,255,.75)">${r.description}</div></div>
+    <div class="modal-section"><div class="modal-label">Reference Number</div><input type="text" placeholder="Enter RTI reference number from PIO" value="${r.referenceNumber||''}" onchange="tracker.updateRef('${id}',this.value);renderTracker()" style="width:100%;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:.75rem;color:white;font-family:monospace;font-size:.88rem;outline:none"/></div>
+    <div class="modal-section"><div class="modal-label">Status</div><select onchange="tracker.updateStatus('${id}',this.value);renderTracker()" style="width:100%;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:.75rem;color:white;font-size:.88rem;outline:none">
+      ${['filed','pending','received','closed','rejected'].map(s=>`<option value="${s}" ${r.status===s?'selected':''}>${tracker.statusEmoji(s)} ${s.charAt(0).toUpperCase()+s.slice(1)}</option>`).join('')}
+    </select></div>
+    <div class="modal-section"><div class="modal-label">Notes</div><textarea placeholder="Add your personal notes..." onchange="tracker.updateNotes('${id}',this.value)" style="width:100%;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:.75rem;color:white;font-family:'DM Sans',sans-serif;font-size:.88rem;min-height:75px;outline:none;resize:vertical">${r.notes||''}</textarea></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem">
+      <button onclick="navigator.clipboard.writeText(document.getElementById('rtiDetailsModal').querySelector('button').click||'');navigator.clipboard.writeText('${(r.draft||'').replace(/'/g,"\\'")}');alert('✅ Draft copied!')" style="background:rgba(0,107,63,.15);border:1px solid rgba(0,107,63,.3);color:var(--green-l);padding:.7rem;border-radius:8px;cursor:pointer;font-weight:600;font-size:.78rem;font-family:'DM Sans',sans-serif">📋 Copy Draft</button>
+      <button onclick="tracker.exportAsCSV()" style="background:rgba(212,160,23,.15);border:1px solid rgba(212,160,23,.3);color:var(--gold);padding:.7rem;border-radius:8px;cursor:pointer;font-weight:600;font-size:.78rem;font-family:'DM Sans',sans-serif">⬇️ Export</button>
+      <button onclick="if(confirm('Delete this RTI?')){tracker.deleteRTI('${id}');renderTracker();document.getElementById('rtiDetailsModal').classList.remove('visible')}" style="background:rgba(248,113,113,.15);border:1px solid rgba(248,113,113,.3);color:#F87171;padding:.7rem;border-radius:8px;cursor:pointer;font-weight:600;font-size:.78rem;font-family:'DM Sans',sans-serif">🗑 Delete</button>
+    </div>`;
+  document.getElementById('rtiDetailsModal').classList.add('visible');
+}
+
+function filterByStatus(s,btn){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTracker(s==='all'?null:s);
+}
+
+function searchRTIs(){
+  const q=document.getElementById('rtiSearchInput').value;
+  if(!q){ renderTracker(); return; }
+  const results=tracker.searchRTIs(q);
+  const container=document.getElementById('rtisList');
+  if(!results.length){ container.innerHTML=`<div class="empty-state">No results for "${q}"</div>`; return; }
+  document.getElementById('rtisList').innerHTML=results.map(r=>`
+    <div class="rti-card" onclick="viewRTIDetail('${r.id}')">
+      <div class="rti-card-top"><div><div class="rti-dept">${r.department}</div><div class="rti-desc">${(r.description||'').substring(0,90)}...</div></div>
+      <span class="status-badge" style="background:${tracker.statusColor(r.status)}22;color:${tracker.statusColor(r.status)}">${tracker.statusEmoji(r.status)} ${r.status.toUpperCase()}</span></div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════
+// FEES DATA
+// ══════════════════════════════════════════════
+const FEES=[
+  {state:'Central Government',fee:'₹10',modes:'IPO, DD, Court Fee Stamp, Online (Debit/Credit/UPI)',days:30,portal:'https://rtionline.gov.in'},
+  {state:'Andhra Pradesh',fee:'₹10',modes:'Court Fee Stamp, DD, IPO',days:30,portal:'https://rtionline.gov.in'},
+  {state:'Assam',fee:'₹10',modes:'Court Fee Stamp, IPO',days:30,portal:'https://rtionline.gov.in'},
+  {state:'Bihar',fee:'₹10',modes:'Court Fee Stamp, IPO, DD',days:30,portal:'https://rtionline.gov.in'},
+  {state:'Chhattisgarh',fee:'₹10',modes:'Court Fee Stamp, DD',days:30,portal:'https://rtionline.gov.in'},
+  {state:'Delhi',fee:'₹10',modes:'IPO, Court Fee Stamp, Online',days:30,portal:'https://rti.delhi.gov.in'},
+  {state:'Goa',fee:'₹10',modes:'Court Fee Stamp, DD',days:30,portal:'https://rtionline.gov.in'},
+  {state:'Gujarat',fee:'₹20',modes:'Court Fee Stamp, DD, Online',days:30,portal:'https://rtionline.gov.in'},
+  {state:'Haryana',fee:'₹10',modes:'Court Fee Stamp, DD',days:30,portal:'https://rtionline.gov.in'},
+  {state:'Himachal Pradesh',fee:'₹10',modes:'Court Fee Stamp, IPO',days:30,portal:'https://rtionline.gov.in'},
+  {state:'Jharkhand',fee:'₹10',modes:'Court Fee Stamp, DD',days:30,portal:'https://rtionline.gov.in'},
+  {state:'Karnataka',fee:'₹10',modes:'Court Fee Stamp, DD, Online',days:30,portal:'https://rtionline.gov.in'},
+  {state:'Kerala',fee:'₹10',modes:'Court Fee Stamp, Online',days:30,portal:'https://rtiportal.kerala.gov.in'},
+  {state:'Madhya Pradesh',fee:'₹10',modes:'Court Fee Stamp, IPO, DD',days:30,portal:'https://rtionline.gov.in'},
+  {state:'Maharashtra',fee:'₹10',modes:'Court Fee Stamp, DD, Online',days:30,portal:'https://rtionline.gov.in'},
+  {state:'Manipur',fee:'₹10',modes:'Court Fee Stamp',days:30,portal:'https://rtionline.gov.in'},
+  {state:'Meghalaya',fee:'₹10',modes:'Court Fee Stamp, IPO',days:30,portal:'https://rtionline.gov.in'},
+  {state:'Odisha',fee:'₹10',modes:'Court Fee Stamp, IPO',days:30,portal:'https://rtionline.gov.in'},
+  {state:'Punjab',fee:'₹10',modes:'Court Fee Stamp, IPO, DD',days:30,portal:'https://rtionline.gov.in'},
+  {state:'Rajasthan',fee:'₹10',modes:'Court Fee Stamp, IPO, Online',days:30,portal:'https://rtionline.gov.in'},
+  {state:'Sikkim',fee:'₹10',modes:'Court Fee Stamp',days:30,portal:'https://rtionline.gov.in'},
+  {state:'Tamil Nadu',fee:'₹10',modes:'Court Fee Stamp, DD',days:30,portal:'https://rtionline.gov.in'},
+  {state:'Telangana',fee:'₹10',modes:'Court Fee Stamp, DD',days:30,portal:'https://rtionline.gov.in'},
+  {state:'Uttar Pradesh',fee:'₹10',modes:'Treasury Challan, IPO, Online',days:30,portal:'https://rtionline.up.gov.in'},
+  {state:'Uttarakhand',fee:'₹10',modes:'Court Fee Stamp, IPO',days:30,portal:'https://rtionline.gov.in'},
+  {state:'West Bengal',fee:'₹10',modes:'Court Fee Stamp, IPO, DD',days:30,portal:'https://rtionline.gov.in'},
+];
+
+function renderFees(){
+  document.getElementById('feesGrid').innerHTML=FEES.map(f=>`
+    <div class="fee-card">
+      <div class="fee-state">${f.state}</div>
+      <div class="fee-amt">${f.fee}</div>
+      <div class="fee-info">📋 ${f.modes}<br/>⏱ Response: ${f.days} days</div>
+      <a class="fee-portal" href="${f.portal}" target="_blank">File RTI Online →</a>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════
+// EXAMPLES DATA
+// ══════════════════════════════════════════════
+const EXAMPLES_DATA=[
+  {cat:'Food',title:'Ration Card Rejected',desc:'Application rejected without written reason. Seeking grounds and officer name.',state:'Maharashtra',ex:'ration'},
+  {cat:'Passport',title:'Passport Pending 6 Months',desc:'No update or communication from Regional Passport Office for 6 months.',state:'Central',ex:'passport'},
+  {cat:'Pension',title:'Old Age Pension Stopped',desc:'Pension not credited for 3 months without any notice or reason.',state:'Rajasthan',ex:'pension'},
+  {cat:'Land',title:'Land Mutation Pending',desc:'Tehsildar office mutation application pending for 8 months.',state:'Uttar Pradesh',ex:'land'},
+  {cat:'Education',title:'Scholarship Not Received',desc:'Applied 6 months ago, no response or disbursement from Social Welfare Dept.',state:'Karnataka',ex:'scholarship'},
+  {cat:'Municipal',title:'Water Supply Irregular',desc:'Irregular municipal water despite 4 months of complaints.',state:'Gujarat',ex:'water'},
+  {cat:'Municipal',title:'Sanctioned Road Not Built',desc:'PMGSY road sanctioned 2 years ago, construction not started.',state:'Bihar',ex:'road'},
+  {cat:'Municipal',title:'Electricity Connection Denied',desc:'New connection application pending for 5 months without response.',state:'Madhya Pradesh',ex:'electricity'},
+  {cat:'Police',title:'FIR Not Registered',desc:'Police refused to register FIR despite multiple visits.',state:'Delhi',ex:'passport'},
+  {cat:'Land',title:'Property Tax Discrepancy',desc:'Property tax assessment seems incorrect, seeking calculation details.',state:'Maharashtra',ex:'ration'},
+];
+
+function renderExamples(catFilter){
+  const data=catFilter==='all'?EXAMPLES_DATA:EXAMPLES_DATA.filter(e=>e.cat===catFilter);
+  document.getElementById('examplesGrid').innerHTML=data.map(e=>`
+    <div class="ex-card">
+      <div class="ex-category">${e.cat}</div>
+      <div class="ex-title">${e.title}</div>
+      <div class="ex-desc">${e.desc}</div>
+      <div class="ex-footer">
+        <span class="ex-state">📍 ${e.state}</span>
+        <button class="ex-use-btn" onclick="useExample('${e.ex}')">→ Use This</button>
+      </div>
+    </div>`).join('');
+}
+
+function filterExamples(cat,btn){
+  document.querySelectorAll('#examples .ex-cat-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderExamples(cat);
+}
+
+// ══════════════════════════════════════════════
+// LEGAL EXAMPLES LIBRARY
+// ══════════════════════════════════════════════
+const LEX_TOOL_META = {
+  consumer:      {label:'Consumer Court',    icon:'🛒', page:'consumer-court',   ccls:'lex-tool-consumer'},
+  legal_notice:  {label:'Legal Notice',      icon:'📜', page:'legal-notice',     ccls:'lex-tool-legal_notice'},
+  labour:        {label:'Labour Complaint',  icon:'💼', page:'labour-complaint', ccls:'lex-tool-labour'},
+  second_appeal: {label:'Second Appeal CIC', icon:'📝', page:'second-appeal',    ccls:'lex-tool-second_appeal'},
+};
+
+function renderLegalExamples(toolFilter){
+  if(!window.LEGAL_EXAMPLES){ document.getElementById('legalExGrid').innerHTML='<p style="color:var(--muted);text-align:center;padding:2rem">Examples loading...</p>'; return; }
+  let cards = [];
+  Object.entries(LEX_TOOL_META).forEach(([key, meta]) => {
+    if(!LEGAL_EXAMPLES[key]) return;
+    LEGAL_EXAMPLES[key].forEach((ex, idx) => cards.push({ex, key, idx, meta}));
+  });
+  if(toolFilter !== 'all') cards = cards.filter(c => c.key === toolFilter);
+  document.getElementById('legalExGrid').innerHTML = cards.map(({ex, key, idx, meta}) => {
+    const diffCls = ex.difficulty==='easy'?'lex-diff-easy':ex.difficulty==='hard'?'lex-diff-hard':'lex-diff-medium';
+    const succCls = ex.success==='high'?'lex-succ-high':ex.success==='low'?'lex-succ-low':'lex-succ-medium';
+    const diffLbl = ex.difficulty==='easy'?'Easy':ex.difficulty==='hard'?'Hard':'Medium';
+    const succLbl = ex.success==='high'?'High Success':ex.success==='low'?'Low Success':'Medium Success';
+    return `<div class="ex-card">
+      <div class="ex-category ${meta.ccls}">${meta.icon} ${meta.label}</div>
+      <div class="ex-title">${ex.title}</div>
+      <div class="ex-desc">${ex.desc}</div>
+      <div class="lex-meta">
+        <span class="lex-badge ${diffCls}">⚡ ${diffLbl}</span>
+        <span class="lex-badge ${succCls}">✅ ${succLbl}</span>
+      </div>
+      <div class="lex-law" title="${ex.which_law}">⚖️ ${ex.which_law}</div>
+      <div class="ex-footer">
+        <span class="ex-state">📍 ${ex.state||ex.dept||''}</span>
+        <button class="ex-use-btn" onclick="useLegalExample('${key}',${idx})">→ Use This</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterLegalExamples(tool, btn){
+  document.querySelectorAll('#lexCats .ex-cat-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderLegalExamples(tool);
+}
+
+function useLegalExample(tool, idx){
+  const page = LEX_TOOL_META[tool]?.page;
+  if(!page) return;
+  showPage(page, null);
+  setTimeout(() => setLegalEx(tool, idx), 200);
+}
+
+function useExample(key){
+  setEx(key);
+  showPage('home',document.querySelectorAll('.nav-btn')[0]);
+  setTimeout(()=>document.getElementById('description').scrollIntoView({behavior:'smooth',block:'center'}),300);
+}
+
+// ══════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════
+function showError(msg){ const e=document.getElementById('errorBox'); e.textContent='❌ '+msg; e.classList.add('show'); }
+
+function copyDraft(){
+  navigator.clipboard.writeText(document.getElementById('draftContent').textContent).then(()=>{
+    const b=document.querySelector('.copy-btn'); b.textContent='✅ Copied!'; setTimeout(()=>b.textContent='📋 Copy',2000);
+  });
+}
+
+function downloadDraft(){
+  if(!lastData){ alert('Please generate an RTI first.'); return; }
+  
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  
+  // Get data
+  const draft = document.getElementById('draftContent').textContent;
+  const dept = document.getElementById('resDept').textContent;
+  const ministry = document.getElementById('resMinistry').textContent;
+  const urgency = document.getElementById('resUrgency').textContent;
+  const state = lastData._state || 'Central';
+  const date = new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
+  const score = lastData.quality_score || 0;
+  const success = lastData.estimated_success_probability || 'Medium';
+  
+  // Page settings
+  const pageWidth = doc.internal.pageSize.width;
+  const pageHeight = doc.internal.pageSize.height;
+  const margin = 20;
+  const maxWidth = pageWidth - 2 * margin;
+  let y = margin;
+  
+  // Header - RTIAssist Logo
+  doc.setFillColor(255, 107, 0);
+  doc.rect(0, 0, pageWidth, 35, 'F');
+  doc.setFontSize(24);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(255, 255, 255);
+  doc.text('RTI Assist', pageWidth/2, 15, {align: 'center'});
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.text('AI-Powered RTI Application Generator', pageWidth/2, 25, {align: 'center'});
+  
+  y = 45;
+  
+  // Title
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(18);
+  doc.setFont('helvetica', 'bold');
+  doc.text('RIGHT TO INFORMATION APPLICATION', pageWidth/2, y, {align: 'center'});
+  y += 12;
+  
+  // Date
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Generated: ' + date, pageWidth/2, y, {align: 'center'});
+  y += 15;
+  
+  // Metadata Box
+  doc.setDrawColor(255, 107, 0);
+  doc.setLineWidth(0.5);
+  doc.rect(margin, y, maxWidth, 35);
+  doc.setFillColor(255, 247, 240);
+  doc.rect(margin, y, maxWidth, 35, 'F');
+  
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(255, 107, 0);
+  doc.text('APPLICATION DETAILS', margin + 5, y + 7);
+  
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(0, 0, 0);
+  doc.text('Department: ' + dept, margin + 5, y + 14);
+  doc.text('State: ' + state, margin + 5, y + 20);
+  doc.text('Ministry: ' + ministry, margin + 5, y + 26);
+  doc.text('Urgency: ' + urgency + ' | Quality Score: ' + score + '/100 | Success Rate: ' + success, margin + 5, y + 32);
+  
+  y += 45;
+  
+  // Draft Content
+  doc.setDrawColor(200, 200, 200);
+  doc.line(margin, y, pageWidth - margin, y);
+  y += 10;
+  
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'bold');
+  doc.text('APPLICATION TEXT:', margin, y);
+  y += 8;
+  
+  // Split draft text into lines that fit
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  const lines = doc.splitTextToSize(draft, maxWidth);
+  
+  lines.forEach((line, index) => {
+    if(y > pageHeight - 30){
+      doc.addPage();
+      y = margin;
+    }
+    doc.text(line, margin, y);
+    y += 6;
+  });
+  
+  // Footer on last page
+  if(y > pageHeight - 50){
+    doc.addPage();
+    y = margin;
+  }
+  
+  y = pageHeight - 25;
+  doc.setDrawColor(200, 200, 200);
+  doc.line(margin, y, pageWidth - margin, y);
+  y += 7;
+  
+  doc.setFontSize(8);
+  doc.setTextColor(100, 100, 100);
+  doc.setFont('helvetica', 'italic');
+  doc.text('Generated by RTIAssist — Free AI-Powered RTI Tool for Indian Citizens', pageWidth/2, y, {align: 'center'});
+  y += 5;
+  doc.text('File this application at: https://rtionline.gov.in', pageWidth/2, y, {align: 'center'});
+  
+  // Save PDF
+  const filename = `RTI_${dept.replace(/\s+/g,'_')}_${new Date().toISOString().slice(0,10)}.pdf`;
+  doc.save(filename);
+  
+  // Update button
+  const btn = document.querySelector('.btn-download');
+  btn.textContent = '✅ Downloaded!';
+  setTimeout(() => btn.textContent = '📄 Download PDF', 2000);
+}
+
+function resetForm(){
+  document.getElementById('description').value='';
+  document.getElementById('state').selectedIndex=0;
+  document.getElementById('resultSection').classList.remove('show');
+  document.getElementById('errorBox').classList.remove('show');
+  ['s1','s2','s3'].forEach(id=>{ const el=document.getElementById(id); el.classList.remove('active','done'); });
+  document.getElementById('s1').classList.add('active');
+  if(countdownInterval) clearInterval(countdownInterval);
+  lastData=null;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ══════════════════════════════════════════════
+// SETTINGS MANAGEMENT
+// ══════════════════════════════════════════════
+function saveSettings(){
+  const settings = {
+    name: document.getElementById('userName').value,
+    phone: document.getElementById('userPhone').value,
+    email: document.getElementById('userEmail').value,
+    address: document.getElementById('userAddress').value,
+    city: document.getElementById('userCity').value,
+    pincode: document.getElementById('userPincode').value,
+    state: document.getElementById('userState').value
+  };
+  localStorage.setItem('rti_user_settings', JSON.stringify(settings));
+  const btn = document.querySelector('.settings-save-btn');
+  btn.textContent = '✅ Saved!';
+  setTimeout(() => btn.textContent = '💾 Save Changes', 2000);
+}
+
+function loadSettings(){
+  const saved = localStorage.getItem('rti_user_settings');
+  if(!saved) return;
+  try {
+    const settings = JSON.parse(saved);
+    if(document.getElementById('userName')) document.getElementById('userName').value = settings.name || '';
+    if(document.getElementById('userPhone')) document.getElementById('userPhone').value = settings.phone || '';
+    if(document.getElementById('userEmail')) document.getElementById('userEmail').value = settings.email || '';
+    if(document.getElementById('userAddress')) document.getElementById('userAddress').value = settings.address || '';
+    if(document.getElementById('userCity')) document.getElementById('userCity').value = settings.city || '';
+    if(document.getElementById('userPincode')) document.getElementById('userPincode').value = settings.pincode || '';
+    if(document.getElementById('userState')) document.getElementById('userState').value = settings.state || '';
+  } catch(e){ console.error('Failed to load settings:', e); }
+}
+
+function getUserSettings(){
+  const saved = localStorage.getItem('rti_user_settings');
+  if(!saved) return null;
+  try { return JSON.parse(saved); } catch(e){ return null; }
+}
+
+function clearSettings(){
+  if(!confirm('⚠️ This will delete all saved personal details. Continue?')) return;
+  localStorage.removeItem('rti_user_settings');
+  if(document.getElementById('userName')) document.getElementById('userName').value = '';
+  if(document.getElementById('userPhone')) document.getElementById('userPhone').value = '';
+  if(document.getElementById('userEmail')) document.getElementById('userEmail').value = '';
+  if(document.getElementById('userAddress')) document.getElementById('userAddress').value = '';
+  if(document.getElementById('userCity')) document.getElementById('userCity').value = '';
+  if(document.getElementById('userPincode')) document.getElementById('userPincode').value = '';
+  if(document.getElementById('userState')) document.getElementById('userState').value = '';
+  alert('✅ All data cleared!');
+}
+
+function exportSettings(){
+  const settings = getUserSettings();
+  if(!settings || !settings.name){ alert('No settings to export. Please save your details first.'); return; }
+  const json = JSON.stringify(settings, null, 2);
+  const blob = new Blob([json], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'RTIAssist_Settings_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+}
+
+function importSettings(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try {
+      const settings = JSON.parse(e.target.result);
+      localStorage.setItem('rti_user_settings', JSON.stringify(settings));
+      loadSettings();
+      alert('✅ Settings imported successfully!');
+    } catch(err){ alert('❌ Invalid file format. Please upload a valid RTIAssist settings JSON file.'); }
+  };
+  reader.readAsText(file);
+}
+
+// INIT
+renderTracker();
+loadSettings();
+
+// ══════════════════════════════════════════════
+// LEGAL TOOLS — NAV DROPDOWN
+// ══════════════════════════════════════════════
+function closeLegalMenu(){
+  document.getElementById('legalMenu').classList.remove('open');
+}
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e){
+  const dropdown = document.querySelector('.nav-dropdown');
+  if(dropdown && !dropdown.contains(e.target)) closeLegalMenu();
+});
+
+// ══════════════════════════════════════════════
+// LEGAL TOOLS — SHARED UTILITIES
+// ══════════════════════════════════════════════
+function copyToolDraft(elId, btn){
+  navigator.clipboard.writeText(document.getElementById(elId).textContent).then(()=>{
+    const orig = btn.textContent;
+    btn.textContent = '✅ Copied!';
+    setTimeout(()=>btn.textContent=orig, 2000);
+  });
+}
+
+function downloadToolPDF(elId, filename){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const text = document.getElementById(elId).textContent;
+  const pageWidth = doc.internal.pageSize.width;
+
+  // Header
+  doc.setFillColor(10,22,40);
+  doc.rect(0,0,pageWidth,22,'F');
+  doc.setTextColor(255,107,0);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(14);
+  doc.text('RTIAssist Legal Tools', pageWidth/2, 14, {align:'center'});
+
+  // Content
+  doc.setTextColor(30,30,30);
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(9);
+  const lines = doc.splitTextToSize(text, pageWidth-30);
+  let y = 32;
+  lines.forEach(line=>{
+    if(y > 275){ doc.addPage(); y = 20; }
+    doc.text(line, 15, y);
+    y += 5.5;
+  });
+
+  // Footer
+  doc.setFontSize(7.5);
+  doc.setTextColor(150,150,150);
+  doc.text('Generated by RTIAssist — Free Legal Document Tool for Indian Citizens | Not legal advice', pageWidth/2, 290, {align:'center'});
+
+  doc.save(`${filename}_${new Date().toISOString().slice(0,10)}.pdf`);
+}
+
+function showToolError(elId, msg){
+  const e = document.getElementById(elId);
+  e.textContent = '❌ '+msg;
+  e.classList.add('show');
+}
+function hideToolError(elId){ document.getElementById(elId).classList.remove('show'); }
+function setToolBtnLoading(id, loading, text){
+  const btn = document.getElementById(id);
+  btn.disabled = loading;
+  btn.classList.toggle('loading', loading);
+  btn.querySelector('.btn-text').textContent = text;
+}
+
+// ══════════════════════════════════════════════
+// SECOND APPEAL (CIC) GENERATOR
+// ══════════════════════════════════════════════
+async function generateCICAppeal(){
+  const name = document.getElementById('cic-name').value.trim();
+  const rtiDate = document.getElementById('cic-rti-date').value;
+  const appealDate = document.getElementById('cic-appeal-date').value;
+  const dept = document.getElementById('cic-dept').value.trim();
+  const query = document.getElementById('cic-query').value.trim();
+  const reason = document.getElementById('cic-reason').value;
+  const details = document.getElementById('cic-details').value.trim();
+
+  if(!name || !dept || !query){ showToolError('cicError','Please fill Name, Department, and RTI Query.'); return; }
+  hideToolError('cicError');
+  setToolBtnLoading('cicBtn', true, 'Generating Second Appeal...');
+
+  try {
+    const res = await fetch(`${API_BASE}/legal/generate`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ tool:'second_appeal', name, rti_date:rtiDate, appeal_date:appealDate, department:dept, query, reason, details })
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.detail||'Server error');
+    document.getElementById('cicDraft').textContent = data.draft;
+    document.getElementById('cicResult').classList.add('show');
+    document.getElementById('cicResult').scrollIntoView({behavior:'smooth'});
+  } catch(e){
+    showToolError('cicError', e.message);
+  } finally {
+    setToolBtnLoading('cicBtn', false, '⚡ Generate Second Appeal — FREE');
+  }
+}
+
+// ══════════════════════════════════════════════
+// CONSUMER COMPLAINT GENERATOR
+// ══════════════════════════════════════════════
+async function generateConsumerComplaint(){
+  const name = document.getElementById('cc-name').value.trim();
+  const address = document.getElementById('cc-address').value.trim();
+  const company = document.getElementById('cc-company').value.trim();
+  const type = document.getElementById('cc-type').value;
+  const desc = document.getElementById('cc-desc').value.trim();
+  const amount = document.getElementById('cc-amount').value.trim();
+  const date = document.getElementById('cc-date').value;
+  const relief = document.getElementById('cc-relief').value;
+
+  if(!name || !company || !desc){ showToolError('ccError','Please fill Name, Company Name, and Problem Description.'); return; }
+  hideToolError('ccError');
+  setToolBtnLoading('ccBtn', true, 'Generating Consumer Complaint...');
+
+  try {
+    const res = await fetch(`${API_BASE}/legal/generate`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ tool:'consumer_complaint', name, address, company, type, description:desc, amount, purchase_date:date, relief })
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.detail||'Server error');
+    document.getElementById('ccDraft').textContent = data.draft;
+    document.getElementById('ccResult').classList.add('show');
+    document.getElementById('ccResult').scrollIntoView({behavior:'smooth'});
+  } catch(e){
+    showToolError('ccError', e.message);
+  } finally {
+    setToolBtnLoading('ccBtn', false, '⚡ Generate Consumer Complaint — FREE');
+  }
+}
+
+// ══════════════════════════════════════════════
+// LEGAL NOTICE GENERATOR
+// ══════════════════════════════════════════════
+async function generateLegalNotice(){
+  const sender = document.getElementById('ln-sender').value.trim();
+  const recipient = document.getElementById('ln-recipient').value.trim();
+  const type = document.getElementById('ln-type').value;
+  const desc = document.getElementById('ln-desc').value.trim();
+  const amount = document.getElementById('ln-amount').value.trim();
+  const state = document.getElementById('ln-state').value;
+
+  if(!sender || !recipient || !desc){ showToolError('lnError','Please fill Sender Name, Recipient Name, and Issue Description.'); return; }
+  hideToolError('lnError');
+  setToolBtnLoading('lnBtn', true, 'Drafting Legal Notice...');
+
+  try {
+    const res = await fetch(`${API_BASE}/legal/generate`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ tool:'legal_notice', sender, recipient, type, description:desc, amount, state })
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.detail||'Server error');
+    document.getElementById('lnDraft').textContent = data.draft;
+    document.getElementById('lnResult').classList.add('show');
+    document.getElementById('lnResult').scrollIntoView({behavior:'smooth'});
+  } catch(e){
+    showToolError('lnError', e.message);
+  } finally {
+    setToolBtnLoading('lnBtn', false, '⚡ Generate Legal Notice — FREE');
+  }
+}
+
+// ══════════════════════════════════════════════
+// LABOUR COMPLAINT GENERATOR
+// ══════════════════════════════════════════════
+async function generateLabourComplaint(){
+  const name = document.getElementById('lc-name').value.trim();
+  const employer = document.getElementById('lc-employer').value.trim();
+  const type = document.getElementById('lc-type').value;
+  const desc = document.getElementById('lc-desc').value.trim();
+  const amount = document.getElementById('lc-amount').value.trim();
+  const state = document.getElementById('lc-state').value;
+
+  if(!name || !employer || !desc){ showToolError('lcError','Please fill Employee Name, Employer Name, and Problem Description.'); return; }
+  if(!state){ showToolError('lcError','Please select your State.'); return; }
+  hideToolError('lcError');
+  setToolBtnLoading('lcBtn', true, 'Generating Labour Complaint...');
+
+  try {
+    const res = await fetch(`${API_BASE}/legal/generate`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ tool:'labour_complaint', name, employer, type, description:desc, amount, state })
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.detail||'Server error');
+    document.getElementById('lcDraft').textContent = data.draft;
+    document.getElementById('lcResult').classList.add('show');
+    document.getElementById('lcResult').scrollIntoView({behavior:'smooth'});
+  } catch(e){
+    showToolError('lcError', e.message);
+  } finally {
+    setToolBtnLoading('lcBtn', false, '⚡ Generate Labour Complaint — FREE');
+  }
+}
+</script>
+
+<!-- Legal Examples Data -->
+<script src="legal_examples.js"></script>
+<!-- UI Translations -->
+<script src="ui_translations.js"></script>
+</body>
+</html>
