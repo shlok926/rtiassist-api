@@ -16,6 +16,8 @@
 > **India's most powerful AI-powered RTI application generator.**
 > Describe your problem in plain language — get a legally correct, ready-to-file RTI application in seconds.
 
+📖 **New to RTI?** Read the [Full RTI Overview, Use Cases & Competitor Comparison →](RTI_PRODUCT_OVERVIEW.md)
+
 </div>
 
 ---
@@ -28,8 +30,9 @@ Over **65 million RTI applications** are filed in India every year — yet most 
 - Draft a **legally correct application** under RTI Act 2005
 - Understand what information is **legally accessible** vs. exempt
 - Know **how and where to file** their application
+- Track **deadlines** for First Appeal (30 days) and Second Appeal (90 days)
 
-RTIAssist solves all 4 problems in one tool — for free, in seconds.
+RTIAssist solves all these problems in one tool — **free**, in **your language**, in **seconds**.
 
 ---
 
@@ -115,18 +118,23 @@ python app.py
 ### Generate an RTI via Website
 1. Open `http://localhost:8080/index_Version4.html`
 2. Click **RTI Generator**
-3. Describe your problem in plain language
+3. Describe your problem in plain language (any Indian language)
 4. Select language + state
-5. Click **Generate** — download or copy your RTI draft
+5. Click **Generate** — download PDF or copy your RTI draft
 
 ### Use Legal Tools
 1. Click **Legal Tools** in the navbar
 2. Choose: Consumer Complaint / Legal Notice / Labour Complaint / Second Appeal
-3. Fill in the form (or pick from **Legal Examples Library**)
+3. Fill in the form (or pick from **Legal Examples Library** — 44 real-world cases)
 4. Generate your legal draft instantly
 
+### RTI Tracker
+1. After generating your RTI, click **Save to Tracker**
+2. Track status: Filed → Response Due → Received / First Appeal / Second Appeal
+3. Set a Telegram Reminder for automatic deadline reminders
+
 ### Telegram Bot
-Send `/start` to the bot → choose language → pick tool → describe your problem → get your draft.
+Send `/start` to [@RTIAssistBot](https://t.me/RTIAssistBot) → choose language → pick tool → describe your problem → get your draft.
 
 ---
 
@@ -286,10 +294,11 @@ Contributions are welcome! Here's how:
 5. Open a Pull Request
 
 **Ideas for contributions:**
-- Add more Indian languages
-- Improve legal draft quality
-- Add more RTI examples
-- UI improvements
+- Add more Indian languages (Assamese, Konkani, Manipuri, Sindhi)
+- Improve AI draft quality with more RTI Act case law
+- Add more real-world RTI examples to the Examples Library
+- UI improvements and mobile responsiveness
+- Persistent reminder backend with database
 
 ---
 
@@ -317,10 +326,30 @@ Powered by **ASI-1 API** by [Fetch.ai](https://fetch.ai)
 
 ## ⚠️ Disclaimer
 
-RTIAssist is an informational tool to help citizens draft RTI applications. It does not constitute legal advice. Always verify PIO details before filing. The generated drafts should be reviewed before submission.
+RTIAssist is an informational and productivity tool designed to help Indian citizens draft RTI applications and legal documents. It does **not** constitute legal advice. Key points:
+
+- Always **verify the PIO name and address** before filing — officers change frequently
+- Generated drafts should be **reviewed before submission**
+- RTIAssist is **not liable** for outcomes of filed applications
+- For complex legal matters, consult a qualified RTI activist or advocate
+- Information about Section 8 exemptions is indicative — final decisions rest with PIOs and Information Commissions
+- **BPL cardholders are exempt from filing fees** — carry BPL card copy when filing in person
 
 ---
 
 ## 📄 License
 
 MIT License — see [LICENSE](LICENSE) for details.
+
+---
+
+<div align="center">
+
+**RTIAssist — Bringing India's Right to Information to every citizen's fingertips.**
+
+*Jan Shakti. Jan Jagruti. Jan Suchna.*
+*(People's Power. People's Awareness. People's Information.)*
+
+Powered by **[ASI-1 API](https://asi1.ai)** &nbsp;|&nbsp; Built with ❤️ by **[Shlok](https://github.com/shlok926)**
+
+</div>
