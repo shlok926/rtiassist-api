@@ -17,6 +17,33 @@ WEBHOOK_PATH = "/telegram"
 _telegram_app = None
 
 
+async def _register_webhook():
+    """Try to register webhook with Telegram, with retries."""
+    if not _telegram_app:
+        return
+    space_host = os.getenv("SPACE_HOST", "")
+    if space_host:
+        webhook_url = f"https://{space_host}{WEBHOOK_PATH}"
+    else:
+        webhook_url = os.getenv("WEBHOOK_URL", "")
+
+    if not webhook_url:
+        logger.warning("WEBHOOK_URL not configured — bot inactive")
+        return
+
+    import asyncio
+    for attempt in range(1, 6):
+        try:
+            await _telegram_app.bot.set_webhook(url=webhook_url, drop_pending_updates=True)
+            logger.info(f"Telegram webhook set: {webhook_url}")
+            return
+        except Exception as e:
+            logger.warning(f"Webhook attempt {attempt}/5 failed: {e}")
+            if attempt < 5:
+                await asyncio.sleep(attempt * 3)
+    logger.error("All webhook registration attempts failed — use /admin/set-webhook to retry manually")
+
+
 async def _setup_telegram():
     global _telegram_app
     if not TELEGRAM_TOKEN:
@@ -42,18 +69,7 @@ async def _setup_telegram():
         _telegram_app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
         await _telegram_app.initialize()
         await _telegram_app.start()
-
-        space_host = os.getenv("SPACE_HOST", "")
-        if space_host:
-            webhook_url = f"https://{space_host}{WEBHOOK_PATH}"
-        else:
-            webhook_url = os.getenv("WEBHOOK_URL", "")
-
-        if webhook_url:
-            await _telegram_app.bot.set_webhook(url=webhook_url, drop_pending_updates=True)
-            logger.info(f"Telegram webhook set: {webhook_url}")
-        else:
-            logger.warning("WEBHOOK_URL not configured — bot inactive")
+        await _register_webhook()
     except Exception as e:
         logger.error(f"Telegram setup failed: {e}")
 
@@ -164,5 +180,18 @@ async def debug_webhook():
             "last_error_message": info.last_error_message,
             "last_error_date": str(info.last_error_date) if info.last_error_date else None,
         }
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@app.get("/admin/set-webhook", include_in_schema=False)
+async def admin_set_webhook():
+    """Manually trigger webhook registration."""
+    if not _telegram_app:
+        return {"error": "Telegram bot not initialized"}
+    try:
+        await _register_webhook()
+        info = await _telegram_app.bot.get_webhook_info()
+        return {"success": True, "webhook_url": info.url}
     except Exception as e:
         return {"error": str(e)}
