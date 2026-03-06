@@ -159,11 +159,15 @@ def health():
 async def telegram_webhook(request: Request):
     """Receive updates from Telegram (webhook mode)."""
     if not _telegram_app:
+        logger.warning("Telegram update received but bot not initialized")
         return Response(status_code=200)
-    from telegram import Update
-    data = await request.json()
-    update = Update.de_json(data, _telegram_app.bot)
-    await _telegram_app.process_update(update)
+    try:
+        from telegram import Update
+        data = await request.json()
+        update = Update.de_json(data, _telegram_app.bot)
+        await _telegram_app.process_update(update)
+    except Exception as e:
+        logger.error(f"Error processing Telegram update: {e}")
     return Response(status_code=200)
 
 

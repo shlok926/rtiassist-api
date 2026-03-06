@@ -32,7 +32,9 @@ except ImportError:
 
 load_dotenv()
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
-API_BASE = os.getenv("API_BASE", "http://localhost:8000")
+# On HF Space, API runs on port 7860; SPACE_HOST auto-set by HF
+_space_host = os.getenv("SPACE_HOST", "")
+API_BASE = os.getenv("API_BASE", f"https://{_space_host}" if _space_host else "http://localhost:7860")
 
 # ── STATE AUTO-DETECT ────────────────────────────
 STATE_KEYWORDS = {
