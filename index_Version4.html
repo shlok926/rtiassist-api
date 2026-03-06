@@ -451,7 +451,7 @@ input:checked+.toggle-slider:before{transform:translateX(20px);}
 /* ⭐ FEEDBACK SECTION */
 .star-row{display:flex;gap:.4rem;margin:.75rem 0;}
 .star-btn{background:none;border:none;font-size:1.8rem;cursor:pointer;transition:transform .15s;line-height:1;padding:.1rem;filter:grayscale(1);opacity:.5;}
-.star-btn.active,.star-btn:hover~.star-btn{filter:grayscale(0);opacity:1;}
+.star-btn.active{filter:grayscale(0);opacity:1;}
 .star-btn.active{transform:scale(1.1);}
 .feedback-textarea{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;padding:.75rem 1rem;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.83rem;resize:vertical;min-height:80px;margin:.6rem 0;box-sizing:border-box;}
 .feedback-textarea:focus{outline:none;border-color:var(--saffron);}
@@ -4222,8 +4222,33 @@ function setRating(val){
   _feedbackRating = val;
   document.querySelectorAll('.star-btn').forEach(btn => {
     btn.classList.toggle('active', parseInt(btn.dataset.val) <= val);
+    btn.style.filter = parseInt(btn.dataset.val) <= val ? 'grayscale(0)' : 'grayscale(1)';
+    btn.style.opacity = parseInt(btn.dataset.val) <= val ? '1' : '0.5';
   });
 }
+
+// Star hover preview
+(function(){
+  const row = document.getElementById('starRow');
+  if(!row) return;
+  row.querySelectorAll('.star-btn').forEach(btn => {
+    btn.addEventListener('mouseenter', () => {
+      const hoverVal = parseInt(btn.dataset.val);
+      row.querySelectorAll('.star-btn').forEach(b => {
+        const on = parseInt(b.dataset.val) <= hoverVal;
+        b.style.filter = on ? 'grayscale(0)' : 'grayscale(1)';
+        b.style.opacity = on ? '1' : '0.5';
+      });
+    });
+  });
+  row.addEventListener('mouseleave', () => {
+    row.querySelectorAll('.star-btn').forEach(b => {
+      const isSelected = parseInt(b.dataset.val) <= _feedbackRating;
+      b.style.filter = isSelected ? 'grayscale(0)' : 'grayscale(1)';
+      b.style.opacity = isSelected ? '1' : '0.5';
+    });
+  });
+})();
 
 async function submitFeedback(){
   if(!_feedbackRating){
