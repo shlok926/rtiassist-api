@@ -435,6 +435,45 @@ input:checked+.toggle-slider:before{transform:translateX(20px);}
 .tg-remind-btn{background:linear-gradient(135deg,#0088cc,#00aaff);color:white;border:none;padding:.55rem 1rem;border-radius:8px;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap;text-decoration:none;display:inline-block;transition:all .2s;}
 .tg-remind-btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(0,136,204,.4);}
 
+/* 🔒 PRIVACY POLICY MODAL */
+.privacy-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:2000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;padding:1rem;}
+.privacy-modal-overlay.open{opacity:1;pointer-events:all;}
+.privacy-modal{background:#0E1F3A;border:1px solid var(--border);border-radius:18px;max-width:660px;width:100%;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.6);}
+.privacy-modal-head{display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);}
+.privacy-modal-head h3{font-size:1rem;font-weight:700;}
+.privacy-close{background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;line-height:1;padding:.2rem .4rem;border-radius:6px;}
+.privacy-close:hover{background:rgba(255,255,255,.08);color:var(--text);}
+.privacy-modal-body{overflow-y:auto;padding:1.5rem;font-size:.82rem;color:var(--muted);line-height:1.85;}
+.privacy-modal-body h4{color:var(--text);font-size:.88rem;margin:1.2rem 0 .4rem;}
+.privacy-modal-body ul{padding-left:1.2rem;margin:.4rem 0;}
+.privacy-modal-body li{margin-bottom:.3rem;}
+
+/* ⭐ FEEDBACK SECTION */
+.star-row{display:flex;gap:.4rem;margin:.75rem 0;}
+.star-btn{background:none;border:none;font-size:1.8rem;cursor:pointer;transition:transform .15s;line-height:1;padding:.1rem;filter:grayscale(1);opacity:.5;}
+.star-btn.active,.star-btn:hover~.star-btn{filter:grayscale(0);opacity:1;}
+.star-btn.active{transform:scale(1.1);}
+.feedback-textarea{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;padding:.75rem 1rem;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.83rem;resize:vertical;min-height:80px;margin:.6rem 0;box-sizing:border-box;}
+.feedback-textarea:focus{outline:none;border-color:var(--saffron);}
+.feedback-email-input{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;padding:.65rem 1rem;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.83rem;margin-bottom:.6rem;box-sizing:border-box;}
+.feedback-email-input:focus{outline:none;border-color:var(--saffron);}
+.feedback-submit-btn{background:linear-gradient(135deg,var(--saffron),var(--saffron-l));border:none;color:white;padding:.65rem 1.4rem;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;}
+.feedback-submit-btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(255,107,0,.3);}
+.feedback-submit-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none;}
+.feedback-success{display:none;background:rgba(0,168,107,.08);border:1px solid rgba(0,168,107,.2);border-radius:10px;padding:1rem;text-align:center;color:var(--green-l);font-size:.88rem;margin-top:.6rem;}
+
+/* ❓ HELP FAQ */
+.faq-item{border:1px solid var(--border);border-radius:10px;margin-bottom:.6rem;overflow:hidden;}
+.faq-q{display:flex;align-items:center;justify-content:space-between;padding:.9rem 1rem;cursor:pointer;font-size:.85rem;font-weight:600;color:var(--text);background:rgba(255,255,255,.02);transition:background .15s;user-select:none;}
+.faq-q:hover{background:rgba(255,255,255,.05);}
+.faq-arrow{transition:transform .2s;font-style:normal;flex-shrink:0;margin-left:.5rem;}
+.faq-item.open .faq-arrow{transform:rotate(180deg);}
+.faq-a{display:none;padding:.75rem 1rem 1rem;font-size:.8rem;color:var(--muted);line-height:1.75;border-top:1px solid var(--border);}
+.faq-item.open .faq-a{display:block;}
+.help-contact-row{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:1rem;}
+.help-contact-btn{display:inline-flex;align-items:center;gap:.4rem;padding:.55rem 1rem;border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer;text-decoration:none;transition:all .2s;border:1.5px solid var(--border);background:rgba(255,255,255,.04);color:var(--text);}
+.help-contact-btn:hover{background:rgba(255,255,255,.08);}
+
 /* LEGAL TOOLS DROPDOWN */
 .nav-dropdown{position:relative;}
 .nav-dropdown-btn{background:transparent;border:none;color:var(--muted);padding:.45rem .9rem;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:500;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:.3rem;}
@@ -1125,25 +1164,142 @@ footer{position:relative;z-index:1;padding:3rem 3rem 2rem;border-top:1px solid v
       </div>
     </div>
 
-    <!-- About Section -->
+    <!-- ⭐ Feedback Section -->
+    <div class="settings-section">
+      <h3 class="settings-title">⭐ Feedback</h3>
+      <p class="settings-desc">Rate your experience and help us improve RTIAssist for millions of Indian citizens.</p>
+      <div id="feedbackForm">
+        <div style="font-size:.85rem;color:var(--muted);margin-bottom:.25rem;">Overall Rating:</div>
+        <div class="star-row" id="starRow">
+          <button class="star-btn" data-val="1" onclick="setRating(1)">⭐</button>
+          <button class="star-btn" data-val="2" onclick="setRating(2)">⭐</button>
+          <button class="star-btn" data-val="3" onclick="setRating(3)">⭐</button>
+          <button class="star-btn" data-val="4" onclick="setRating(4)">⭐</button>
+          <button class="star-btn" data-val="5" onclick="setRating(5)">⭐</button>
+        </div>
+        <textarea class="feedback-textarea" id="feedbackComment" placeholder="What did you like? What can be improved? Any feature request? (optional)"></textarea>
+        <input class="feedback-email-input" type="email" id="feedbackEmail" placeholder="Your email (optional — only if you want a reply)"/>
+        <button class="feedback-submit-btn" id="feedbackSubmitBtn" onclick="submitFeedback()">📤 Submit Feedback</button>
+      </div>
+      <div class="feedback-success" id="feedbackSuccess">🙏 Thank you! Your feedback has been received and will help improve RTIAssist for millions of Indian citizens.</div>
+    </div>
+
+    <!-- ❓ Help & Support -->
+    <div class="settings-section">
+      <h3 class="settings-title">❓ Help & Support</h3>
+      <p class="settings-desc">Frequently asked questions and support options.</p>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">How do I file my RTI after generating the draft? <i class="faq-arrow">▼</i></div>
+        <div class="faq-a"><strong>Online:</strong> Go to <a href="https://rtionline.gov.in" target="_blank" style="color:var(--saffron-l)">rtionline.gov.in</a>, register, paste your draft, pay ₹10 online.<br/><br/><strong>By Post:</strong> Print the draft, attach ₹10 Indian Postal Order (IPO), send by Speed Post to the PIO mentioned in filing instructions.</div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">Is RTIAssist really free? <i class="faq-arrow">▼</i></div>
+        <div class="faq-a">Yes — 100% free, forever. RTIAssist is open-source. No subscription, no hidden charges. The only cost is ₹10 RTI filing fee paid directly to the government.</div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">Is my data safe? <i class="faq-arrow">▼</i></div>
+        <div class="faq-a">Yes. Your personal details (name, address etc.) are saved only in your browser's localStorage — never uploaded to any server. Only your problem description is sent to the AI to generate the draft, via encrypted API calls.</div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">Why is my draft in English even though I selected Hindi/Marathi? <i class="faq-arrow">▼</i></div>
+        <div class="faq-a">This was a known bug that has been fixed. Make sure the page is fully loaded. If issue persists, press Ctrl+Shift+R (hard refresh) and try again. The language modal will appear after you click Generate.</div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">What if the PIO doesn't respond in 30 days? <i class="faq-arrow">▼</i></div>
+        <div class="faq-a">File a <strong>First Appeal</strong> under Section 19(1) of RTI Act 2005. Use the "Generate First Appeal Letter" button below your draft. If First Appeal also fails, file a Second Appeal to CIC/SIC using the Legal Tools section.</div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">How do I use the Telegram Bot? <i class="faq-arrow">▼</i></div>
+        <div class="faq-a">Search <strong>@RTIAssistBot</strong> on Telegram or click the button below. Send /start → choose your language → describe your problem → get your RTI draft instantly. The bot also supports Consumer Complaint, Legal Notice, Labour Complaint, and Second Appeal.</div>
+      </div>
+
+      <div class="help-contact-row">
+        <a href="https://t.me/RTIAssistBot" target="_blank" class="help-contact-btn">🤖 Telegram Bot</a>
+        <a href="https://github.com/shlok926/rtiassist-api/issues/new" target="_blank" class="help-contact-btn">🐛 Report a Bug</a>
+        <a href="https://github.com/shlok926/rtiassist-api" target="_blank" class="help-contact-btn">📂 GitHub</a>
+        <a href="https://rti.gov.in" target="_blank" class="help-contact-btn">🏛️ RTI Act 2005</a>
+      </div>
+    </div>
+
+    <!-- 🔒 Privacy Policy Section -->
+    <div class="settings-section">
+      <h3 class="settings-title">🔒 Privacy Policy</h3>
+      <p class="settings-desc">RTIAssist is built with privacy-first principles.</p>
+      <button class="feedback-submit-btn" onclick="document.getElementById('privacyModal').classList.add('open')" style="margin-bottom:1rem">📄 Read Full Privacy Policy</button>
+      <div style="font-size:.8rem;color:var(--muted);line-height:1.85">
+        ✅ Personal details stored <strong style="color:var(--text)">locally only</strong> (never uploaded)<br/>
+        ✅ Problem descriptions sent to AI via <strong style="color:var(--text)">encrypted API calls</strong><br/>
+        ✅ No tracking, no cookies, no analytics<br/>
+        ✅ Open source — full code on GitHub
+      </div>
+    </div>
+
+    <!-- ℹ️ About Section -->
     <div class="settings-section">
       <h3 class="settings-title">ℹ️ About RTIAssist</h3>
       <div class="about-content">
         <p><strong>Version:</strong> 2.0 (March 2026)</p>
         <p><strong>Project:</strong> Open Source RTI Tool for Indian Citizens</p>
-        <p><strong>AI Technology:</strong> Advanced Multi-Layer Reasoning Pipeline</p>
+        <p><strong>AI Technology:</strong> Advanced Multi-Layer Reasoning Pipeline (ASI-1)</p>
         <p><strong>License:</strong> Free & Open Source (MIT)</p>
-        <p><strong>Support:</strong> GitHub Issues & Community Forum</p>
         <p><strong>Contact:</strong> <a href="mailto:support@rtiassist.in" style="color:var(--saffron-l);text-decoration:none">support@rtiassist.in</a></p>
         <br/>
-        <a href="https://github.com/shlok926/RTIASSIST-API" target="_blank" class="settings-link">📂 View on GitHub</a>
-        <a href="#" onclick="alert('Privacy Policy: RTIAssist does not collect, store, or share any personal data. All user inputs are processed locally or via encrypted API calls.')" class="settings-link">🔒 Privacy Policy</a>
+        <a href="https://github.com/shlok926/rtiassist-api" target="_blank" class="settings-link">📂 View on GitHub</a>
         <a href="https://rti.gov.in" target="_blank" class="settings-link">🏛️ Official RTI Act 2005</a>
       </div>
     </div>
 
   </div>
 </div>
+</div>
+
+<!-- 🔒 PRIVACY POLICY MODAL -->
+<div class="privacy-modal-overlay" id="privacyModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="privacy-modal">
+    <div class="privacy-modal-head">
+      <h3>🔒 Privacy Policy — RTIAssist</h3>
+      <button class="privacy-close" onclick="document.getElementById('privacyModal').classList.remove('open')">✕</button>
+    </div>
+    <div class="privacy-modal-body">
+      <p><strong>Last updated:</strong> March 2026 &nbsp;| <strong>Version:</strong> 2.0</p>
+
+      <h4>1. What data we collect</h4>
+      <ul>
+        <li><strong>Problem description</strong> — Sent to AI API to generate your draft. Not stored on any server.</li>
+        <li><strong>Personal details</strong> (name, address, phone) — Saved only in your browser's localStorage. Never sent to any server.</li>
+        <li><strong>Feedback</strong> — Rating and comments sent to Formspree and delivered to the project maintainer's email only.</li>
+      </ul>
+
+      <h4>2. What we do NOT collect</h4>
+      <ul>
+        <li>❌ No cookies or tracking</li>
+        <li>❌ No IP address or device info</li>
+        <li>❌ No selling or sharing of data with any third party</li>
+        <li>❌ No RTI drafts stored on our servers</li>
+        <li>❌ No analytics or usage monitoring</li>
+      </ul>
+
+      <h4>3. AI API usage</h4>
+      <p>Your problem description is sent to the <strong>ASI-1 API</strong> (by Fetch.ai) to generate the RTI draft. Processed and returned immediately — not stored. See <a href="https://fetch.ai" target="_blank" style="color:var(--saffron-l)">Fetch.ai's privacy policy</a> for their data handling.</p>
+
+      <h4>4. Telegram Bot</h4>
+      <p>If you use the Telegram bot, your messages are processed by Telegram's servers per <a href="https://telegram.org/privacy" target="_blank" style="color:var(--saffron-l)">Telegram's Privacy Policy</a>. The bot does not store conversation history.</p>
+
+      <h4>5. Data deletion</h4>
+      <p>To delete all locally stored data: Settings → <strong>"🗑️ Clear All Data"</strong>. This removes everything from localStorage immediately.</p>
+
+      <h4>6. Contact</h4>
+      <p>Questions? <a href="mailto:support@rtiassist.in" style="color:var(--saffron-l)">support@rtiassist.in</a> or <a href="https://github.com/shlok926/rtiassist-api/issues" target="_blank" style="color:var(--saffron-l)">open an issue on GitHub</a>.</p>
+
+      <p style="margin-top:1.2rem;font-size:.75rem;color:rgba(255,255,255,.35)">RTIAssist is open-source. This policy applies to the web interface and Telegram bot only.</p>
+    </div>
+  </div>
 </div>
 
 <!-- ══════════ PAGE: FILING GUIDE ══════════ -->
@@ -4055,6 +4211,69 @@ document.addEventListener('DOMContentLoaded', ()=>{
   // Check alerts after tracker loads (slight delay)
   setTimeout(checkDeadlineAlerts, 800);
 });
+
+// ══════════════════════════════════════════════════════
+// ⭐ FEEDBACK (Formspree)
+// ══════════════════════════════════════════════════════
+
+let _feedbackRating = 0;
+
+function setRating(val){
+  _feedbackRating = val;
+  document.querySelectorAll('.star-btn').forEach(btn => {
+    btn.classList.toggle('active', parseInt(btn.dataset.val) <= val);
+  });
+}
+
+async function submitFeedback(){
+  if(!_feedbackRating){
+    alert('Please select a star rating first.');
+    return;
+  }
+  const comment = document.getElementById('feedbackComment').value.trim();
+  const email = document.getElementById('feedbackEmail').value.trim();
+  const btn = document.getElementById('feedbackSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+
+  try {
+    const res = await fetch('https://formspree.io/f/meerqjde', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+      body: JSON.stringify({
+        rating: `${_feedbackRating}/5 stars`,
+        comment: comment || '(no comment)',
+        email: email || '(not provided)',
+        source: 'RTIAssist Website',
+        submitted_at: new Date().toLocaleString('en-IN')
+      })
+    });
+    if(res.ok){
+      document.getElementById('feedbackForm').style.display = 'none';
+      const success = document.getElementById('feedbackSuccess');
+      success.style.display = 'block';
+    } else {
+      btn.disabled = false;
+      btn.textContent = '📤 Submit Feedback';
+      alert('Submission failed. Please try again.');
+    }
+  } catch(e){
+    btn.disabled = false;
+    btn.textContent = '📤 Submit Feedback';
+    alert('Network error. Please check your connection and try again.');
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// ❓ HELP FAQ TOGGLE
+// ══════════════════════════════════════════════════════
+
+function toggleFaq(item){
+  const isOpen = item.classList.contains('open');
+  // Close all open FAQs
+  document.querySelectorAll('.faq-item.open').forEach(f => f.classList.remove('open'));
+  if(!isOpen) item.classList.add('open');
+}
 </script>
 
 <!-- LANGUAGE SELECTION MODAL -->
