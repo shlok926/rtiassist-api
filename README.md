@@ -4,7 +4,7 @@
 
 **RTIAssist — AI-Powered RTI & Legal Tools for Indian Citizens**
 
-🌐 [Website](#) &nbsp;|&nbsp; 📖 [API Docs](#-api-reference) &nbsp;|&nbsp; 🤖 [Telegram Bot](#-telegram-bot) &nbsp;|&nbsp; ⚡ [Quick Start](#-quick-start) &nbsp;|&nbsp; 🤝 [Contributing](#-contributing)
+🌐 [Website](https://shlok926.github.io/rtiassist-api) &nbsp;|&nbsp; 📖 [API Docs](#-api-reference) &nbsp;|&nbsp; 🤖 [Telegram Bot](#-telegram-bot) &nbsp;|&nbsp; ⚡ [Quick Start](#-quick-start) &nbsp;|&nbsp; 🤝 [Contributing](#-contributing)
 
 [![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python&logoColor=white)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
