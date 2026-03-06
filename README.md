@@ -298,6 +298,8 @@ Contributions are welcome! Here's how:
 - OCR — scan rejection letters and auto-draft appeals
 - Persistent Telegram reminders with database backend
 - WhatsApp Bot integration
+- **Gram Panchayat Complaint** — MNREGA funds misused? Road/nali not built? File formal complaint to District Collector
+- **Tender Objection (CVC)** — Government tender irregularity? File CVC complaint + RTI for tender documents combo
 
 ---
 
