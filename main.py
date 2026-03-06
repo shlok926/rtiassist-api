@@ -1,4 +1,5 @@
 import os
+import asyncio
 import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, Response
@@ -18,33 +19,21 @@ _telegram_app = None
 
 
 async def _register_webhook():
-    """Try to register webhook with Telegram, with retries."""
-    if not _telegram_app:
-        return
+    """Register webhook with Telegram — called after initialize() succeeds."""
     space_host = os.getenv("SPACE_HOST", "")
-    if space_host:
-        webhook_url = f"https://{space_host}{WEBHOOK_PATH}"
-    else:
-        webhook_url = os.getenv("WEBHOOK_URL", "")
-
+    webhook_url = f"https://{space_host}{WEBHOOK_PATH}" if space_host else os.getenv("WEBHOOK_URL", "")
     if not webhook_url:
         logger.warning("WEBHOOK_URL not configured — bot inactive")
         return
-
-    import asyncio
-    for attempt in range(1, 6):
-        try:
-            await _telegram_app.bot.set_webhook(url=webhook_url, drop_pending_updates=True)
-            logger.info(f"Telegram webhook set: {webhook_url}")
-            return
-        except Exception as e:
-            logger.warning(f"Webhook attempt {attempt}/5 failed: {e}")
-            if attempt < 5:
-                await asyncio.sleep(attempt * 3)
-    logger.error("All webhook registration attempts failed — use /admin/set-webhook to retry manually")
+    try:
+        await _telegram_app.bot.set_webhook(url=webhook_url, drop_pending_updates=True)
+        logger.info(f"Telegram webhook set: {webhook_url}")
+    except Exception as e:
+        logger.error(f"Webhook registration failed: {e}")
 
 
 async def _setup_telegram():
+    """Initialize Telegram bot in background with retries — never blocks startup."""
     global _telegram_app
     if not TELEGRAM_TOKEN:
         return
@@ -57,26 +46,38 @@ async def _setup_telegram():
             start, help_cmd, about, fee, state_cmd, legal_cmd,
             button_callback, handle_message, myreminders_cmd
         )
-        _telegram_app = Application.builder().token(TELEGRAM_TOKEN).updater(None).build()
-        _telegram_app.add_handler(CommandHandler("start", start))
-        _telegram_app.add_handler(CommandHandler("help", help_cmd))
-        _telegram_app.add_handler(CommandHandler("about", about))
-        _telegram_app.add_handler(CommandHandler("fee", fee))
-        _telegram_app.add_handler(CommandHandler("state", state_cmd))
-        _telegram_app.add_handler(CommandHandler("legal", legal_cmd))
-        _telegram_app.add_handler(CommandHandler("myreminders", myreminders_cmd))
-        _telegram_app.add_handler(CallbackQueryHandler(button_callback))
-        _telegram_app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-        await _telegram_app.initialize()
-        await _telegram_app.start()
-        await _register_webhook()
+        # Build app and add handlers (no network needed)
+        app = Application.builder().token(TELEGRAM_TOKEN).updater(None).build()
+        app.add_handler(CommandHandler("start", start))
+        app.add_handler(CommandHandler("help", help_cmd))
+        app.add_handler(CommandHandler("about", about))
+        app.add_handler(CommandHandler("fee", fee))
+        app.add_handler(CommandHandler("state", state_cmd))
+        app.add_handler(CommandHandler("legal", legal_cmd))
+        app.add_handler(CommandHandler("myreminders", myreminders_cmd))
+        app.add_handler(CallbackQueryHandler(button_callback))
+        app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+
+        # Retry initialize() until network is available
+        for attempt in range(1, 11):
+            try:
+                await app.initialize()
+                await app.start()
+                _telegram_app = app  # Only set AFTER successful initialize
+                logger.info("✅ Telegram bot initialized successfully")
+                await _register_webhook()
+                return
+            except Exception as e:
+                logger.warning(f"Telegram init attempt {attempt}/10 failed: {e}")
+                await asyncio.sleep(attempt * 5)
+        logger.error("All Telegram init attempts failed")
     except Exception as e:
         logger.error(f"Telegram setup failed: {e}")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await _setup_telegram()
+    asyncio.create_task(_setup_telegram())  # Run in background — don't block startup
     yield
     if _telegram_app:
         await _telegram_app.stop()
