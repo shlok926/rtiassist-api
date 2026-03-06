@@ -28,7 +28,7 @@ async def _setup_telegram():
         )
         from telegram_bot import (
             start, help_cmd, about, fee, state_cmd, legal_cmd,
-            button_callback, handle_message
+            button_callback, handle_message, myreminders_cmd
         )
         _telegram_app = Application.builder().token(TELEGRAM_TOKEN).updater(None).build()
         _telegram_app.add_handler(CommandHandler("start", start))
@@ -37,6 +37,7 @@ async def _setup_telegram():
         _telegram_app.add_handler(CommandHandler("fee", fee))
         _telegram_app.add_handler(CommandHandler("state", state_cmd))
         _telegram_app.add_handler(CommandHandler("legal", legal_cmd))
+        _telegram_app.add_handler(CommandHandler("myreminders", myreminders_cmd))
         _telegram_app.add_handler(CallbackQueryHandler(button_callback))
         _telegram_app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
         await _telegram_app.initialize()

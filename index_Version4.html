@@ -393,6 +393,48 @@ select option{background:var(--navy-mid);}
 .float-tg .tg-icon{font-size:1.3rem;}
 @keyframes float-pulse{0%,100%{box-shadow:0 6px 20px rgba(0,136,204,.4)}50%{box-shadow:0 6px 30px rgba(0,136,204,.6)}}
 
+/* 🔔 BELL ICON & ALERT PANEL */
+.bell-wrap{position:relative;}
+.bell-btn{background:none;border:none;font-size:1.2rem;cursor:pointer;padding:.3rem .4rem;border-radius:8px;transition:background .2s;position:relative;}
+.bell-btn:hover{background:rgba(255,255,255,.08);}
+.bell-badge{position:absolute;top:-4px;right:-4px;background:#EF4444;color:white;border-radius:50%;width:18px;height:18px;font-size:.65rem;font-weight:700;display:flex!important;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;}
+.bell-panel{display:none;position:absolute;right:0;top:calc(100% + 10px);width:320px;background:#0E1F3A;border:1px solid var(--border);border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,.5);z-index:1000;padding:1rem;animation:fadeDown .15s ease;}
+.bell-panel.open{display:block;}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.bell-panel-title{font-size:.85rem;font-weight:700;margin-bottom:.75rem;color:var(--text);border-bottom:1px solid var(--border);padding-bottom:.6rem;}
+.bell-alert-item{border-radius:10px;padding:.75rem;margin-bottom:.5rem;cursor:pointer;transition:background .15s;}
+.bell-alert-item:hover{background:rgba(255,255,255,.05);}
+.bell-alert-urgent{background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2);}
+.bell-alert-warn{background:rgba(212,160,23,.06);border:1px solid rgba(212,160,23,.2);}
+.bell-alert-info{background:rgba(0,168,107,.06);border:1px solid rgba(0,168,107,.15);}
+.bell-alert-dept{font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:.2rem;}
+.bell-alert-msg{font-size:.75rem;color:var(--muted);}
+.bell-alert-tag{display:inline-block;font-size:.68rem;font-weight:700;padding:.15rem .5rem;border-radius:4px;margin-bottom:.35rem;}
+.bell-tag-red{background:rgba(248,113,113,.15);color:#F87171;}
+.bell-tag-yellow{background:rgba(212,160,23,.15);color:var(--gold);}
+.bell-tag-green{background:rgba(0,168,107,.15);color:var(--green-l);}
+.bell-empty{color:var(--muted);font-size:.82rem;text-align:center;padding:1rem 0;}
+
+/* 🔔 NOTIFICATION SETTINGS TOGGLE */
+.notif-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:.9rem 0;border-bottom:1px solid rgba(255,255,255,.06);}
+.notif-toggle-row:last-child{border-bottom:none;}
+.notif-toggle-label{font-size:.88rem;color:var(--text);}
+.notif-toggle-desc{font-size:.75rem;color:var(--muted);margin-top:.15rem;}
+.toggle-switch{position:relative;width:44px;height:24px;flex-shrink:0;}
+.toggle-switch input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:rgba(255,255,255,.1);border-radius:24px;cursor:pointer;transition:.3s;}
+.toggle-slider:before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.3s;}
+input:checked+.toggle-slider{background:var(--saffron);}
+input:checked+.toggle-slider:before{transform:translateX(20px);}
+
+/* 🔔 TELEGRAM REMINDER BANNER (after save) */
+.tg-remind-banner{background:linear-gradient(135deg,rgba(0,136,204,.12),rgba(0,136,204,.05));border:1px solid rgba(0,136,204,.25);border-radius:12px;padding:1rem 1.2rem;margin-top:.75rem;display:flex;align-items:center;gap:.85rem;}
+.tg-remind-icon{font-size:1.8rem;flex-shrink:0;}
+.tg-remind-text{flex:1;font-size:.82rem;color:var(--muted);line-height:1.6;}
+.tg-remind-text strong{color:var(--text);}
+.tg-remind-btn{background:linear-gradient(135deg,#0088cc,#00aaff);color:white;border:none;padding:.55rem 1rem;border-radius:8px;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap;text-decoration:none;display:inline-block;transition:all .2s;}
+.tg-remind-btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(0,136,204,.4);}
+
 /* LEGAL TOOLS DROPDOWN */
 .nav-dropdown{position:relative;}
 .nav-dropdown-btn{background:transparent;border:none;color:var(--muted);padding:.45rem .9rem;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:500;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:.3rem;}
@@ -560,6 +602,17 @@ footer{position:relative;z-index:1;padding:3rem 3rem 2rem;border-top:1px solid v
     <button class="nav-btn" onclick="showPage('about',this)">ℹ️ About</button>
     <button class="nav-btn" onclick="showPage('settings',this)">⚙️ Settings</button>
     <button class="nav-btn" id="langToggleBtn" onclick="toggleUILanguage()" data-translate="nav.langToggle">🌐 हिन्दी</button>
+    <!-- 🔔 BELL ICON -->
+    <div class="bell-wrap" id="bellWrap">
+      <button class="bell-btn" id="bellBtn" onclick="toggleBellPanel()" title="Deadline Alerts">
+        🔔
+        <span class="bell-badge" id="bellBadge" style="display:none">0</span>
+      </button>
+      <div class="bell-panel" id="bellPanel">
+        <div class="bell-panel-title">🔔 Deadline Alerts</div>
+        <div id="bellAlertsList"><div class="bell-empty">No upcoming deadlines 🎉</div></div>
+      </div>
+    </div>
   </div>
 </nav>
 
@@ -1040,13 +1093,36 @@ footer{position:relative;z-index:1;padding:3rem 3rem 2rem;border-top:1px solid v
         <div class="notice-text">✅ All data stored locally in browser (localStorage)<br/>✅ NO server upload — your information never leaves your device<br/>✅ You can clear anytime using "Clear All Data" button<br/>✅ RTIAssist doesn't collect, track, or store any personal information</div>
       </div>
     </div>
-
-    <!-- Quick Actions -->
     <div class="settings-actions">
       <button class="settings-action-btn btn-clear" onclick="clearSettings()">🗑️ Clear All Data</button>
       <button class="settings-action-btn btn-export" onclick="exportSettings()">📤 Export Settings (JSON)</button>
       <button class="settings-action-btn btn-import" onclick="document.getElementById('importFile').click()">📥 Import Settings</button>
       <input type="file" id="importFile" accept=".json" style="display:none" onchange="importSettings(event)"/>
+    </div>
+
+    <!-- 🔔 Notifications Section -->
+    <div class="settings-section">
+      <h3 class="settings-title">🔔 Notifications</h3>
+      <p class="settings-desc">Get alerts when your RTI response deadlines are approaching.</p>
+
+      <div class="notif-toggle-row">
+        <div>
+          <div class="notif-toggle-label">🔔 Browser Notifications</div>
+          <div class="notif-toggle-desc">Get notified even when the website is in background. Requires one-time permission.</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="browserNotifToggle" onchange="toggleBrowserNotif(this.checked)"/>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="notif-toggle-row">
+        <div>
+          <div class="notif-toggle-label">🔵 Telegram Reminders</div>
+          <div class="notif-toggle-desc">Bot sends you a message 7 days and 1 day before your RTI deadline. Save an RTI to the tracker and use the "Set Telegram Reminder" button.</div>
+        </div>
+        <a href="https://t.me/RTIAssistBot" target="_blank" class="tg-remind-btn" style="font-size:.75rem;padding:.4rem .8rem;">Open Bot →</a>
+      </div>
     </div>
 
     <!-- About Section -->
@@ -2184,14 +2260,30 @@ function tickCountdown(){
 // ══════════════════════════════════════════════
 function saveToTracker(){
   if(!lastData) return;
-  tracker.addRTI({ description:lastData._desc||lastData.information_needed||'Generated RTI', department:lastData.department, ministry:lastData.ministry, state:lastData._state||'Central', quality_score:lastData.quality_score, draft:lastData.draft });
+  const savedRTI = tracker.addRTI({ description:lastData._desc||lastData.information_needed||'Generated RTI', department:lastData.department, ministry:lastData.ministry, state:lastData._state||'Central', quality_score:lastData.quality_score, draft:lastData.draft });
   const btn=document.querySelector('.btn-save-tracker');
   btn.textContent='✅ Saved! Go to My RTIs →';
   btn.style.background='rgba(0,168,107,.15)';
   btn.style.borderColor='rgba(0,168,107,.3)';
   btn.style.color='var(--green-l)';
   btn.onclick=()=>showPage('tracker',document.querySelectorAll('.nav-btn')[1]);
+
+  // Show Telegram reminder banner
+  const dept = lastData.department || 'RTI Application';
+  const dueDate = savedRTI?.dueDate || '';
+  const deeplink = `https://t.me/RTIAssistBot?start=remind_${encodeURIComponent(dept)}_${dueDate}`;
+  let banner = document.getElementById('tgRemindBanner');
+  if(!banner){
+    banner = document.createElement('div');
+    banner.id = 'tgRemindBanner';
+    banner.className = 'tg-remind-banner';
+    btn.parentNode.insertBefore(banner, btn.nextSibling);
+  }
+  banner.innerHTML = `<div class="tg-remind-icon">🤖</div><div class="tg-remind-text"><strong>Get Telegram Reminders?</strong><br/>Bot will remind you 7 days & 1 day before deadline for <em>${dept}</em>.</div><a href="${deeplink}" target="_blank" class="tg-remind-btn">Set Reminder →</a>`;
+  banner.style.display='flex';
+
   renderTracker();
+  checkDeadlineAlerts();
 }
 
 // ══════════════════════════════════════════════
@@ -3841,6 +3933,128 @@ window.updateUILanguage = updateUILanguage;
 window.toggleUILanguage = toggleUILanguage;
 window.currentUILanguage = () => currentUILanguage;
 
+</script>
+
+<script>
+// ══════════════════════════════════════════════════════
+// 🔔 BELL ICON + DEADLINE ALERTS + BROWSER NOTIFICATIONS
+// ══════════════════════════════════════════════════════
+
+function toggleBellPanel(){
+  const panel = document.getElementById('bellPanel');
+  panel.classList.toggle('open');
+  if(panel.classList.contains('open')) checkDeadlineAlerts();
+  // close when clicking outside
+  setTimeout(()=>{
+    document.addEventListener('click', closeBellOnOutside, {once:true});
+  },0);
+}
+
+function closeBellOnOutside(e){
+  const wrap = document.getElementById('bellWrap');
+  if(!wrap.contains(e.target)){
+    document.getElementById('bellPanel').classList.remove('open');
+  } else {
+    document.addEventListener('click', closeBellOnOutside, {once:true});
+  }
+}
+
+function checkDeadlineAlerts(){
+  if(typeof tracker === 'undefined') return;
+  const rtis = tracker.getAllRTIs ? tracker.getAllRTIs() : [];
+  const today = new Date(); today.setHours(0,0,0,0);
+  const alerts = [];
+
+  rtis.forEach(r => {
+    if(r.status === 'received' || r.status === 'closed') return;
+    if(!r.dueDate) return;
+    const due = new Date(r.dueDate); due.setHours(0,0,0,0);
+    const daysLeft = Math.ceil((due - today) / 86400000);
+    const dept = r.department || 'RTI';
+    if(daysLeft < 0){
+      alerts.push({dept, msg:`Response overdue by ${Math.abs(daysLeft)} day(s)!`, type:'urgent', days:daysLeft, id:r.id});
+    } else if(daysLeft <= 1){
+      alerts.push({dept, msg:`Deadline is TOMORROW! File appeal if no response.`, type:'urgent', days:daysLeft, id:r.id});
+    } else if(daysLeft <= 3){
+      alerts.push({dept, msg:`Only ${daysLeft} days left for response deadline.`, type:'warn', days:daysLeft, id:r.id});
+    } else if(daysLeft <= 7){
+      alerts.push({dept, msg:`${daysLeft} days left — check if response received.`, type:'info', days:daysLeft, id:r.id});
+    }
+  });
+
+  // Update badge
+  const badge = document.getElementById('bellBadge');
+  if(alerts.length > 0){
+    badge.textContent = alerts.length;
+    badge.style.display = 'flex';
+  } else {
+    badge.style.display = 'none';
+  }
+
+  // Render in panel
+  const list = document.getElementById('bellAlertsList');
+  if(!alerts.length){
+    list.innerHTML = '<div class="bell-empty">No upcoming deadlines 🎉<br/><span style="font-size:.72rem">Save RTIs to tracker to get alerts.</span></div>';
+    return;
+  }
+  list.innerHTML = alerts.map(a => {
+    const cls = a.type==='urgent'?'bell-alert-urgent':a.type==='warn'?'bell-alert-warn':'bell-alert-info';
+    const tag = a.type==='urgent'?'<span class="bell-alert-tag bell-tag-red">🔴 URGENT</span>':a.type==='warn'?'<span class="bell-alert-tag bell-tag-yellow">🟡 WARNING</span>':'<span class="bell-alert-tag bell-tag-green">🟢 REMINDER</span>';
+    return `<div class="bell-alert-item ${cls}" onclick="showPage('tracker',null);document.getElementById('bellPanel').classList.remove('open')">
+      ${tag}
+      <div class="bell-alert-dept">${a.dept}</div>
+      <div class="bell-alert-msg">${a.msg}</div>
+    </div>`;
+  }).join('');
+
+  // Browser notification (if permission granted)
+  if(Notification.permission === 'granted' && localStorage.getItem('rtiNotifEnabled') === 'true'){
+    const lastNotifDate = localStorage.getItem('rtiLastNotifDate');
+    const todayStr = today.toISOString().split('T')[0];
+    if(lastNotifDate !== todayStr){
+      alerts.filter(a=>a.type==='urgent'||a.type==='warn').forEach(a=>{
+        new Notification('RTIAssist — Deadline Alert 🔔', {
+          body: `${a.dept}: ${a.msg}`,
+          icon: 'https://visgrow-03-rtiassist-api.hf.space/favicon.ico',
+          tag: 'rtiassist-deadline'
+        });
+      });
+      localStorage.setItem('rtiLastNotifDate', todayStr);
+    }
+  }
+}
+
+function toggleBrowserNotif(enabled){
+  if(enabled){
+    if(!('Notification' in window)){
+      alert('Your browser does not support notifications.');
+      document.getElementById('browserNotifToggle').checked = false;
+      return;
+    }
+    Notification.requestPermission().then(permission => {
+      if(permission === 'granted'){
+        localStorage.setItem('rtiNotifEnabled','true');
+        document.getElementById('browserNotifToggle').checked = true;
+        new Notification('RTIAssist Notifications Enabled ✅',{body:'You will get deadline reminders when you open this site.'});
+      } else {
+        localStorage.setItem('rtiNotifEnabled','false');
+        document.getElementById('browserNotifToggle').checked = false;
+        alert('Notifications blocked. Please allow notifications for this site in your browser settings.');
+      }
+    });
+  } else {
+    localStorage.setItem('rtiNotifEnabled','false');
+  }
+}
+
+// On page load: restore notification toggle state + check alerts
+document.addEventListener('DOMContentLoaded', ()=>{
+  const notifEnabled = localStorage.getItem('rtiNotifEnabled') === 'true';
+  const toggle = document.getElementById('browserNotifToggle');
+  if(toggle) toggle.checked = notifEnabled && Notification.permission === 'granted';
+  // Check alerts after tracker loads (slight delay)
+  setTimeout(checkDeadlineAlerts, 800);
+});
 </script>
 
 <!-- LANGUAGE SELECTION MODAL -->

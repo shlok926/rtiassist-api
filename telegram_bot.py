@@ -7,7 +7,8 @@ import os
 import asyncio
 import requests
 import io
-from datetime import datetime
+from datetime import datetime, timedelta
+from urllib.parse import unquote
 from dotenv import load_dotenv
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
@@ -189,7 +190,22 @@ async def show_tool_menu(chat_or_msg, lang, edit=False):
 
 
 # ── /start ───────────────────────────────────────
+# In-memory reminder store: {chat_id: [{dept, due_date, job_ids}]}
+_reminders: dict = {}
+
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    args = context.args  # deeplink payload after /start
+    if args and args[0].startswith('remind_'):
+        # Format: remind_<dept>_<YYYY-MM-DD>
+        payload = unquote(args[0][7:])  # strip 'remind_'
+        parts = payload.rsplit('_', 1)
+        dept = parts[0] if len(parts) >= 1 else 'Your RTI'
+        due_str = parts[1] if len(parts) == 2 else ''
+        chat_id = update.effective_chat.id
+        await _schedule_reminder(context, chat_id, dept, due_str, update)
+        return
+
     if 'ui_language' not in context.user_data:
         # Step 1: Choose language
         await update.message.reply_text(
@@ -203,6 +219,125 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data.pop('pending_legal_tool', None)
         context.user_data.pop('pending_text', None)
         await show_tool_menu(update.message, lang)
+
+
+async def _schedule_reminder(context, chat_id: int, dept: str, due_str: str, update):
+    """Schedule 7-day and 1-day Telegram reminders for an RTI deadline."""
+    try:
+        due_date = datetime.strptime(due_str, '%Y-%m-%d') if due_str else None
+    except ValueError:
+        due_date = None
+
+    if not due_date:
+        await update.message.reply_text(
+            f"✅ *Reminder set for:* {dept}\n\n"
+            "⚠️ Could not parse the deadline date. "
+            "Please note your deadline manually and check back here.",
+            parse_mode='Markdown'
+        )
+        return
+
+    today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    days_left = (due_date - today).days
+
+    if days_left < 0:
+        await update.message.reply_text(
+            f"⚠️ *{dept}*\n\nYour RTI response deadline ({due_str}) has already passed!\n"
+            "📝 Consider filing a *First Appeal* immediately.",
+            parse_mode='Markdown'
+        )
+        return
+
+    # Store reminder in memory
+    if chat_id not in _reminders:
+        _reminders[chat_id] = []
+    _reminders[chat_id].append({'dept': dept, 'due_date': due_str, 'days_left': days_left})
+
+    # Schedule jobs using APScheduler via JobQueue
+    jq = context.job_queue
+    scheduled = []
+
+    if jq:
+        if days_left >= 7:
+            remind_7 = due_date - timedelta(days=7)
+            if remind_7 > today:
+                jq.run_once(
+                    _send_reminder_msg,
+                    when=remind_7.replace(hour=9, minute=0),
+                    chat_id=chat_id,
+                    name=f'remind_{chat_id}_{due_str}_7',
+                    data={'dept': dept, 'due_str': due_str, 'days': 7}
+                )
+                scheduled.append('7 days before')
+
+        if days_left >= 1:
+            remind_1 = due_date - timedelta(days=1)
+            if remind_1 > today:
+                jq.run_once(
+                    _send_reminder_msg,
+                    when=remind_1.replace(hour=9, minute=0),
+                    chat_id=chat_id,
+                    name=f'remind_{chat_id}_{due_str}_1',
+                    data={'dept': dept, 'due_str': due_str, 'days': 1}
+                )
+                scheduled.append('1 day before')
+
+    schedule_info = ', '.join(scheduled) if scheduled else 'saved (reminders will be sent as scheduled)'
+
+    await update.message.reply_text(
+        f"✅ *Reminder Set!*\n\n"
+        f"🏛 *Department:* {dept}\n"
+        f"📅 *Deadline:* {due_str} ({days_left} days left)\n"
+        f"🔔 *Reminders scheduled:* {schedule_info}\n\n"
+        "I will message you before the deadline automatically. "
+        "You can set multiple reminders by clicking 'Set Reminder' for each saved RTI.",
+        parse_mode='Markdown'
+    )
+
+
+async def _send_reminder_msg(context):
+    """Callback for APScheduler job — sends reminder message."""
+    job = context.job
+    data = job.data
+    dept = data.get('dept', 'Your RTI')
+    due_str = data.get('due_str', '')
+    days = data.get('days', 0)
+    emoji = '🚨' if days <= 1 else '⏰'
+    msg = (
+        f"{emoji} *RTI Deadline Reminder*\n\n"
+        f"🏛 *Department:* {dept}\n"
+        f"📅 *Response due:* {due_str}\n"
+        f"⏳ *{days} day{'s' if days>1 else ''} remaining*\n\n"
+    )
+    if days <= 1:
+        msg += (
+            "🔴 *Deadline is TOMORROW!*\n"
+            "If you haven't received a response, file a *First Appeal* immediately under Section 19(1) RTI Act 2005.\n\n"
+            "Use /start and choose *First Appeal* to generate the letter."
+        )
+    else:
+        msg += (
+            "Please check if you have received a response from the department.\n"
+            "If not received, be ready to file a *First Appeal* in 7 days."
+        )
+    await context.bot.send_message(chat_id=job.chat_id, text=msg, parse_mode='Markdown')
+
+
+async def myreminders_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Show all active reminders for this user."""
+    chat_id = update.effective_chat.id
+    reminders = _reminders.get(chat_id, [])
+    if not reminders:
+        await update.message.reply_text(
+            "📭 *No active reminders.*\n\n"
+            "Save an RTI from the website tracker and click 'Set Reminder →' to get deadline alerts here.",
+            parse_mode='Markdown'
+        )
+        return
+    lines = ["🔔 *Your Active RTI Reminders:*\n"]
+    for r in reminders:
+        lines.append(f"🏛 {r['dept']} — Due: {r['due_date']} ({r['days_left']}d left)")
+    await update.message.reply_text('\n'.join(lines), parse_mode='Markdown')
 
 
 # ── /state ───────────────────────────────────────
@@ -1141,6 +1276,7 @@ def main():
     app.add_handler(CommandHandler("fee", fee))
     app.add_handler(CommandHandler("state", state_cmd))
     app.add_handler(CommandHandler("legal", legal_cmd))
+    app.add_handler(CommandHandler("myreminders", myreminders_cmd))
     app.add_handler(CallbackQueryHandler(button_callback))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
