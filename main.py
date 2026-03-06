@@ -149,3 +149,20 @@ async def telegram_webhook(request: Request):
     update = Update.de_json(data, _telegram_app.bot)
     await _telegram_app.process_update(update)
     return Response(status_code=200)
+
+
+@app.get("/debug/webhook", include_in_schema=False)
+async def debug_webhook():
+    """Debug endpoint — check webhook status."""
+    if not _telegram_app:
+        return {"error": "Telegram bot not initialized", "token_set": bool(os.getenv("TELEGRAM_TOKEN"))}
+    try:
+        info = await _telegram_app.bot.get_webhook_info()
+        return {
+            "webhook_url": info.url,
+            "pending_update_count": info.pending_update_count,
+            "last_error_message": info.last_error_message,
+            "last_error_date": str(info.last_error_date) if info.last_error_date else None,
+        }
+    except Exception as e:
+        return {"error": str(e)}
