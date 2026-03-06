@@ -69,12 +69,13 @@ The application MUST follow this exact structure:
 2. Addressee block (To: The Public Information Officer)
 3. Subject line
 4. Opening paragraph citing RTI Act 2005
-5. Numbered list of specific information sought (be precise and unambiguous)
-6. Request for certified copies / inspection as applicable
-7. Fee payment declaration
-8. BPL exemption clause placeholder
-9. Closing with applicant placeholder fields
-10. Enclosures list
+5. Numbered list of specific information sought — MINIMUM 6-8 detailed points. Each point must ask for a specific document, record, file noting, approval, order, name+designation of officer, date, reason, or measurement. Never be vague.
+6. Request for certified copies of relevant documents
+7. Request for inspection of records if applicable
+8. Fee payment declaration
+9. BPL exemption clause placeholder
+10. Closing with applicant placeholder fields
+11. Enclosures list
 
 Use placeholder fields in [SQUARE_BRACKETS] for:
 - [APPLICANT_NAME]
@@ -91,11 +92,10 @@ Use placeholder fields in [SQUARE_BRACKETS] for:
 Rules:
 - CRITICAL: Write the ENTIRE application in the language specified in the user message. Do not mix languages.
 - Use formal legal language appropriate to the specified language
-- Be specific — vague requests get rejected
-- The numbered information points must be detailed and exhaustive (minimum 5-7 points)
+- Information points must be DETAILED and EXHAUSTIVE — minimum 6-8 numbered points. A short application with only 2-3 points is NOT acceptable.
+- Each information point must ask for a SPECIFIC record, document, name, date, reason, or file — not broad questions
 - Do NOT ask for opinions or recommendations (RTI only covers recorded information)
-- Do NOT ask for information exempt under Section 8 (national security, cabinet papers, personal info of others, etc.)
-- Keep each information point as a separate numbered item
+- Do NOT ask for information exempt under Section 8 (national security, cabinet papers, personal info of third parties, etc.)
 - Include a full, properly formatted application — do not truncate or summarise
 - Return ONLY the application text, no JSON, no explanation
 """

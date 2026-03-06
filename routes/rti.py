@@ -280,7 +280,27 @@ Enclosures:
         scenario_key = "passport"
     
     scenario = demo_scenarios[scenario_key]
-    draft = scenario[f"draft_{request.language}"] if request.language == "hindi" else scenario["draft_english"]
+    # For non-Hindi/English languages, use real AI draft generator
+    # so the draft actually comes out in the requested language
+    lang = (request.language or 'english').lower()
+    if lang not in ('english', 'hindi'):
+        from agents.intent_classifier import classify_intent as _ci
+        from agents.pio_resolver import resolve_pio as _pr
+        try:
+            _intent = _ci(request.description)
+            _pio = _pr(
+                department=scenario['department'],
+                ministry=scenario['ministry'],
+                government_level='state' if request.state else 'central',
+                state_name=request.state,
+            )
+            draft = generate_draft(intent=_intent, pio_info=_pio, language=lang)
+        except Exception:
+            draft = scenario['draft_english']  # fallback
+    elif lang == 'hindi':
+        draft = scenario.get('draft_hindi', scenario['draft_english'])
+    else:
+        draft = scenario['draft_english']
     
     # Determine state and government level
     gov_level = "state" if request.state else "central"
