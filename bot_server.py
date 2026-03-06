@@ -17,7 +17,7 @@ from telegram.ext import (
 # Import all handlers from main bot file
 from telegram_bot import (
     start, help_cmd, about, fee, state_cmd, legal_cmd,
-    button_callback, handle_message, TELEGRAM_TOKEN, API_BASE
+    button_callback, handle_message, myreminders_cmd, TELEGRAM_TOKEN, API_BASE
 )
 
 load_dotenv()
@@ -37,6 +37,7 @@ telegram_app.add_handler(CommandHandler("about", about))
 telegram_app.add_handler(CommandHandler("fee", fee))
 telegram_app.add_handler(CommandHandler("state", state_cmd))
 telegram_app.add_handler(CommandHandler("legal", legal_cmd))
+telegram_app.add_handler(CommandHandler("myreminders", myreminders_cmd))
 telegram_app.add_handler(CallbackQueryHandler(button_callback))
 telegram_app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
