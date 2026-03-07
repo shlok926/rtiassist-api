@@ -9,7 +9,7 @@ pinned: false
 
 <div align="center">
 
-<img src="rtiassist_logo.png" alt="RTIAssist Logo" width="300"/>
+<img src="https://raw.githubusercontent.com/shlok926/rtiassist-api/main/rtiassist_logo.png" alt="RTIAssist Logo" width="300"/>
 
 **RTIAssist — AI-Powered RTI & Legal Tools for Indian Citizens**
 
