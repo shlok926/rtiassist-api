@@ -332,13 +332,16 @@ async def myreminders_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not reminders:
         await update.message.reply_text(
             "📭 *No active reminders.*\n\n"
-            "Save an RTI from the website tracker and click 'Set Reminder →' to get deadline alerts here.",
+            "Save an RTI from the website tracker and click 'Set Reminder →' to get deadline alerts here.\n\n"
+            "⚠️ _Note: Reminders are session-based and may reset if the server restarts. "
+            "Permanent storage coming soon!_",
             parse_mode='Markdown'
         )
         return
     lines = ["🔔 *Your Active RTI Reminders:*\n"]
     for r in reminders:
         lines.append(f"🏛 {r['dept']} — Due: {r['due_date']} ({r['days_left']}d left)")
+    lines.append("\n⚠️ _Note: Reminders are session-based and may reset if the server restarts. Permanent storage coming soon!_")
     await update.message.reply_text('\n'.join(lines), parse_mode='Markdown')
 
 
