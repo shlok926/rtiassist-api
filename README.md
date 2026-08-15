@@ -12,7 +12,7 @@
 [![ASI-1](https://img.shields.io/badge/Powered%20by-ASI--1%20API-6B46C1)](https://asi1.ai)
 [![Telegram](https://img.shields.io/badge/Telegram-Bot-2CA5E0?logo=telegram&logoColor=white)](#-telegram-bot)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)](Dockerfile)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 > **India's most powerful AI-powered RTI application generator.**
 > Describe your problem in plain language — get a legally correct, ready-to-file RTI application in seconds.
