@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import DraftResult from './DraftResult';
 import LanguageModal from './LanguageModal';
 
-const RTIForm = () => {
+const RTIForm = ({ setActiveTab }) => {
   const [description, setDescription] = useState('');
   const [state, setState] = useState('');
   const [category, setCategory] = useState('');
@@ -13,14 +13,14 @@ const RTIForm = () => {
   const [isLangModalOpen, setIsLangModalOpen] = useState(false);
 
   const quickExamples = [
-    { label: '🍚 Ration Card', text: 'My ration card application was rejected 3 months ago and I want to know the exact reason, who rejected it, and see the complete file noting.' },
-    { label: '📘 Passport', text: 'My passport application (File No: XX) is pending for 2 months. I want to know the current status, reasons for delay, and expected date of dispatch.' },
-    { label: '👴 Pension', text: 'My father\'s pension has stopped coming since last 4 months. Please provide the reason, the officer responsible, and steps to resume it.' },
-    { label: '🌾 Land Mutation', text: 'Applied for land mutation 6 months ago. What is the current status? Please provide copies of all internal file notings and reasons for delay.' },
-    { label: '🎓 Scholarship', text: 'Applied for post-matric scholarship. Provide the status of my application, reasons if held up, and details of funds disbursed this year.' },
-    { label: '💧 Water Supply', text: 'There is no water supply in my colony (Address) for the last 10 days. Provide copies of complaints received and action taken reports.' },
-    { label: '🛣️ Road', text: 'Provide details of the contractor who built the road in (Area), total budget allocated, copy of the contract, and guarantee period.' },
-    { label: '⚡ Electricity', text: 'Frequent power cuts in (Area). Provide log of power cuts in the last 30 days, reasons for outages, and maintenance schedule.' },
+    { label: 'Ration Card', text: 'My ration card application was rejected 3 months ago and I want to know the exact reason, who rejected it, and see the complete file noting.' },
+    { label: 'Passport', text: 'My passport application (File No: XX) is pending for 2 months. I want to know the current status, reasons for delay, and expected date of dispatch.' },
+    { label: 'Pension', text: 'My father\'s pension has stopped coming since last 4 months. Please provide the reason, the officer responsible, and steps to resume it.' },
+    { label: 'Land Mutation', text: 'Applied for land mutation 6 months ago. What is the current status? Please provide copies of all internal file notings and reasons for delay.' },
+    { label: 'Scholarship', text: 'Applied for post-matric scholarship. Provide the status of my application, reasons if held up, and details of funds disbursed this year.' },
+    { label: 'Water Supply', text: 'There is no water supply in my colony (Address) for the last 10 days. Provide copies of complaints received and action taken reports.' },
+    { label: 'Road', text: 'Provide details of the contractor who built the road in (Area), total budget allocated, copy of the contract, and guarantee period.' },
+    { label: 'Electricity', text: 'Frequent power cuts in (Area). Provide log of power cuts in the last 30 days, reasons for outages, and maintenance schedule.' },
   ];
 
   const handleExampleClick = (text) => {
@@ -102,8 +102,14 @@ const RTIForm = () => {
               {ex.label}
             </button>
           ))}
-          <button className="px-3 py-1.5 text-gray-500 text-sm hover:text-gray-700 font-medium">
-            📚 All Examples →
+          <button 
+            onClick={(e) => {
+              e.preventDefault();
+              if (setActiveTab) setActiveTab('examples');
+            }}
+            className="px-3 py-1.5 text-gray-500 text-sm hover:text-gray-700 font-medium"
+          >
+            All Examples →
           </button>
         </div>
       </div>
