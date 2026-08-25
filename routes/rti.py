@@ -1,4 +1,5 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Response
+from pydantic import BaseModel
 from models.schemas import RTIRequest, RTIResponse
 from agents.intent_classifier import classify_intent
 from agents.pio_resolver import resolve_pio
@@ -10,6 +11,9 @@ import os
 _GLOBAL_DEMO = os.getenv("DEMO_MODE", "false").lower() == "true"
 
 router = APIRouter(prefix="/rti", tags=["RTI"])
+
+class PDFRequest(BaseModel):
+    draft: str
 
 
 def get_demo_response(request: RTIRequest) -> RTIResponse:
@@ -449,3 +453,16 @@ async def generate_rti(request: RTIRequest):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Pipeline error: {str(e)}")
+
+@router.post("/pdf")
+async def generate_rti_pdf(request: PDFRequest):
+    try:
+        from utils.pdf_generator import generate_pdf_bytes
+        pdf_bytes = generate_pdf_bytes(request.draft)
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={"Content-Disposition": "attachment; filename=RTI_Application.pdf"}
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating PDF: {str(e)}")
