@@ -3,7 +3,7 @@ services:
     name: rtiassist-bot
     runtime: python
     buildCommand: pip install -r requirements.txt
-    startCommand: python bot_server.py
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     plan: free
     envVars:
       - key: TELEGRAM_TOKEN
