@@ -39,7 +39,7 @@ function App() {
             </div>
 
             {/* The Generator Form */}
-            <RTIForm />
+            <RTIForm setActiveTab={setActiveTab} />
           </>
         )}
 
