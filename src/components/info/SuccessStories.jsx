@@ -36,7 +36,7 @@ const SuccessStories = () => {
       id: 4,
       category: '🛣️ Road Construction',
       title: '₹40 Lakh Road Completed',
-      story: '"PMGSY road sanctioned 3 years ago, no work done. RTI revealed contractor took advance but didn\\'t start. District Magistrate ordered completion — road ready in 4 months!"',
+      story: `"PMGSY road sanctioned 3 years ago, no work done. RTI revealed contractor took advance but didn't start. District Magistrate ordered completion — road ready in 4 months!"`,
       state: '📍 Bihar',
       time: '⏱ Resolved in 120 days',
       impact: '5 villages connected to highway',
