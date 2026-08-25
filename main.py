@@ -125,9 +125,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # Register routes
 app.include_router(rti_router)
 app.include_router(legal_router)
+from routes.pdf_analysis import router as pdf_analysis_router
+from routes.document_drafting import router as document_drafting_router
+from routes.company_registration import router as company_registration_router
+app.include_router(pdf_analysis_router)
+app.include_router(document_drafting_router)
+app.include_router(company_registration_router)
 
 
 @app.get("/", response_model=HealthResponse, tags=["Health"])

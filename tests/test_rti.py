@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from main import app
 
-client = TestClient(app)
+client = TestClient(app, raise_server_exceptions=True)
 
 
 # ── Mock ASI-1 response factory ───────────────────────────────────────────────
@@ -31,7 +31,7 @@ def mock_intent(description):
         "confidence": 0.92,
     }
 
-def mock_pio(dept, ministry, govt_level, state_name):
+def mock_pio(department, ministry, government_level, state_name):
     return {
         "pio_designation": "Public Information Officer, Food and Civil Supplies",
         "appellate_authority_designation": "Deputy Director, Food and Civil Supplies",

@@ -15,3 +15,10 @@ QUICK_START.md
 test_bot_features.py
 test_features.py
 
+
+# Node.js
+node_modules/
+dist/
+
+# Other
+pytest_output*.txt

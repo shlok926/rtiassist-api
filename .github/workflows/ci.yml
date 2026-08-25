@@ -1,0 +1,50 @@
+name: RTIAssist CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  backend-tests:
+    name: Backend Tests (Python)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+        
+    - name: Install backend dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest httpx
+        
+    - name: Run Pytest
+      run: |
+        # Run existing python tests
+        pytest tests/
+
+  frontend-tests:
+    name: Frontend Build & Tests (Node.js)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: "20"
+        
+    - name: Install frontend dependencies
+      run: npm install
+        
+    - name: Run Vite Build Check
+      run: npm run build
+      
+    - name: Run Frontend Tests (Vitest)
+      run: npm run test
