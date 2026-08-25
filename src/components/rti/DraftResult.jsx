@@ -3,6 +3,7 @@ import FirstAppealModal from './FirstAppealModal';
 
 const DraftResult = ({ data, onReset }) => {
   const [isAppealModalOpen, setIsAppealModalOpen] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   
   if (!data) return null;
 
@@ -26,6 +27,34 @@ const DraftResult = ({ data, onReset }) => {
     } catch (e) {
       console.error(e);
       alert('Failed to save to tracker');
+    }
+  };
+
+  const handleDownloadPDF = async () => {
+    setIsDownloading(true);
+    try {
+      const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+      const response = await fetch(`${API_BASE_URL}/rti/pdf`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ draft: data.draft })
+      });
+      
+      if (!response.ok) throw new Error('Failed to generate PDF');
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'RTI_Application.pdf';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert("❌ Could not download PDF: " + err.message);
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -91,8 +120,15 @@ const DraftResult = ({ data, onReset }) => {
           <span className="font-bold text-gray-700">📄 Your RTI Application Draft</span>
           <div className="flex gap-2">
             <button 
+              onClick={handleDownloadPDF}
+              disabled={isDownloading}
+              className="px-3 py-1.5 bg-red-50 text-red-700 border border-red-200 rounded text-sm font-bold hover:bg-red-100 flex items-center gap-1"
+            >
+              {isDownloading ? '⏳...' : '📄 PDF'}
+            </button>
+            <button 
               onClick={() => navigator.clipboard.writeText(data.draft)}
-              className="px-3 py-1.5 bg-white border border-gray-300 rounded text-sm font-medium hover:bg-gray-50"
+              className="px-3 py-1.5 bg-white border border-gray-300 rounded text-sm font-medium hover:bg-gray-50 flex items-center gap-1"
             >
               📋 Copy
             </button>
