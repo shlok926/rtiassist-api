@@ -16,3 +16,4 @@ passlib[bcrypt]
 alembic
 psycopg2-binary
 pytesseract
+fpdf
