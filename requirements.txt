@@ -18,3 +18,4 @@ alembic
 psycopg2-binary
 pytesseract
 fpdf
+pytest-asyncio

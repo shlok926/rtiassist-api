@@ -109,8 +109,10 @@ def test_case_a_verified_authority(citizen_token):
     assert result["match_status"] == "MATCHED"
     
     # Generate doc should succeed
-    res = client.post(f"/cases/{case_id}/generate-document", json={"language": "english"}, headers={"Authorization": f"Bearer {citizen_token}"})
-    assert res.status_code == 200
+    with patch("agents.draft_generator.call_asi1", return_value="This is a mock draft"), \
+         patch("agents.quality_checker.call_asi1", return_value=json.dumps({"is_valid": True, "score": 90, "issues": [], "suggestions": [], "exempt_risk": "low"})):
+        res = client.post(f"/cases/{case_id}/generate-document", json={"language": "english"}, headers={"Authorization": f"Bearer {citizen_token}"})
+        assert res.status_code == 200
 
 def test_case_b_unverified_authority(citizen_token):
     case_id, result = _run_case_up_to_resolution(citizen_token, "Need Railway data", "Test Railways", "CENTRAL")
