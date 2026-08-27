@@ -65,6 +65,59 @@ Draft a complete, ready-to-file RTI application now.
 
     return draft
 
+def generate_case_draft(problem_description: str, action: str, authority_context: dict, language: str = "english") -> str:
+    """
+    Phase 5: Case-Based Document Generation.
+    Uses problem description and verified authority context to draft the document.
+    """
+    LANGUAGE_MAP = {
+        "hindi":     "Hindi (Devanagari script — हिन्दी)",
+        "marathi":   "Marathi (Devanagari script — मराठी)",
+        "tamil":     "Tamil (Tamil script — தமிழ்)",
+        "telugu":    "Telugu (Telugu script — తెలుగు)",
+        "kannada":   "Kannada (Kannada script — ಕನ್ನಡ)",
+        "bengali":   "Bengali (Bengali script — বাংলা)",
+        "gujarati":  "Gujarati (Gujarati script — ગુજરાતી)",
+        "punjabi":   "Punjabi (Gurmukhi script — ਪੰਜਾਬੀ)",
+        "malayalam": "Malayalam (Malayalam script — മലയാളം)",
+        "odia":      "Odia (Odia script — ଓଡ଼ିଆ)",
+        "english":   "formal English",
+    }
+    lang_key = language.lower().strip()
+    lang_name = LANGUAGE_MAP.get(lang_key, "formal English")
+    language_instruction = (
+        f"IMPORTANT: You MUST write the ENTIRE application in {lang_name}. "
+        f"Every word — including the heading, addressee block, subject line, body, "
+        f"and closing — must be in {lang_name}. Do NOT use English unless the language itself is English."
+    )
+
+    user_message = f"""
+{language_instruction}
+
+Citizen Objective/Problem: {problem_description}
+Document Type: {action}
+
+Addressee details (From Verified Source):
+- PIO Designation: {authority_context.get('pio_designation', 'Public Information Officer')}
+- Department: {authority_context.get('department')}
+- Ministry: {authority_context.get('ministry', '')}
+- Address: {authority_context.get('address', '')}
+
+Filing details:
+- Filing Fee: {authority_context.get('filing_fee', '')}
+- Accepted Payment Modes: {authority_context.get('payment_methods', '')}
+
+Draft a complete, ready-to-file {action} application now. Ensure it matches the requested language perfectly.
+"""
+
+    draft = call_asi1(
+        system_prompt=DRAFT_GENERATOR,
+        user_message=user_message,
+        temperature=0.3,
+        max_tokens=2500,
+    )
+
+    return draft
 
 def build_filing_instructions(pio_info: dict, intent: dict) -> str:
     """

@@ -376,5 +376,14 @@ async def generate_legal_document(req: LegalRequest):
 
     else:
         raise HTTPException(status_code=400, detail=f"Unknown tool: {req.tool}")
+        
+    # Append a clear disclaimer to the draft
+    draft += "\n\n*** IMPORTANT NOTE ***\nThis is an experimental/demo generated document and has not been reviewed by legal professionals. It is provided for educational purposes only."
 
-    return {"draft": draft, "tool": req.tool, "status": "success"}
+    return {
+        "draft": draft, 
+        "tool": req.tool, 
+        "status": "success",
+        "is_demo": True,
+        "disclaimer": "The legal tools feature is currently in experimental demo mode. Responses are template-based."
+    }

@@ -10,3 +10,12 @@ aiohttp
 reportlab
 pdfplumber
 python-multipart
+sqlalchemy
+python-jose
+passlib[bcrypt]
+bcrypt==3.2.2
+alembic
+psycopg2-binary
+pytesseract
+fpdf
+pytest-asyncio

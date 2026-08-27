@@ -1,5 +1,6 @@
 import json
 from utils.asi1_client import call_asi1
+from utils.llm_parser import parse_llm_json
 from prompts.system_prompts import INTENT_CLASSIFIER
 
 
@@ -22,13 +23,8 @@ def classify_intent(description: str) -> dict:
         max_tokens=500,
     )
 
-    try:
-        # Strip any markdown code fences if present
-        clean = raw.strip().strip("```json").strip("```").strip()
-        result = json.loads(clean)
-    except json.JSONDecodeError:
-        # Fallback: return a low-confidence default so the pipeline doesn't crash
-        result = {
+    def get_fallback():
+        return {
             "information_needed": description,
             "department": "Unknown",
             "ministry": "Unknown",
@@ -39,6 +35,8 @@ def classify_intent(description: str) -> dict:
             "urgency_reason": "Could not classify automatically",
             "confidence": 0.3,
         }
+
+    result = parse_llm_json(raw, default_factory=get_fallback)
 
     # Validate confidence is a proper float
     try:
