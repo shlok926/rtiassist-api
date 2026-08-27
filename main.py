@@ -5,13 +5,29 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
+import uuid
+import time
 from routes.rti import router as rti_router
 from routes.legal import router as legal_router
+from routes.cases import router as cases_router
+from routes.authorities import router as authorities_router
+from routes.admin_authorities import router as admin_authorities_router
+from routes.pdf_analysis import router as pdf_analysis_router
+from routes.auth import router as auth_router
 from models.schemas import HealthResponse
+from models.database import engine, Base
+import models.orm  # Load all models for Base.metadata.create_all
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Initialize DB for Phase 2 development (Temporary before Alembic)
+from utils.config import ENVIRONMENT
+if ENVIRONMENT != "production":
+    Base.metadata.create_all(bind=engine)
+
+ENVIRONMENT = os.getenv("ENVIRONMENT", "production").lower()
 
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "")
 WEBHOOK_PATH = "/telegram"
@@ -21,24 +37,11 @@ _telegram_initialized = False
 
 
 async def _build_telegram_app():
-    from telegram.ext import (
-        Application, CommandHandler, MessageHandler,
-        filters, CallbackQueryHandler
-    )
-    from telegram_bot import (
-        start, help_cmd, about, fee, state_cmd, legal_cmd,
-        button_callback, handle_message, myreminders_cmd
-    )
-    app = Application.builder().token(TELEGRAM_TOKEN).updater(None).build()
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("help", help_cmd))
-    app.add_handler(CommandHandler("about", about))
-    app.add_handler(CommandHandler("fee", fee))
-    app.add_handler(CommandHandler("state", state_cmd))
-    app.add_handler(CommandHandler("legal", legal_cmd))
-    app.add_handler(CommandHandler("myreminders", myreminders_cmd))
-    app.add_handler(CallbackQueryHandler(button_callback))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    from integrations.telegram import get_telegram_app
+    app = get_telegram_app()
+    if not app:
+        return None
+    # We must set updater to None manually if running in webhook mode, but it's done inside get_telegram_app
     return app
 
 
@@ -52,6 +55,9 @@ async def _get_telegram_app():
             return _telegram_app
         try:
             app = await _build_telegram_app()
+            if not app:
+                _telegram_initialized = True
+                return None
             await app.initialize()
             await app.start()
             _telegram_app = app
@@ -109,26 +115,53 @@ Indian citizens to access government information easily and exercise their democ
     version="1.0.0",
     contact={
         "name": "RTIAssist API",
-        "url": "https://github.com/yourusername/rtiassist-api",
+        "url": "https://github.com/shlok926/rtiassist-api",
     },
     license_info={
         "name": "MIT",
     },
 )
 
-# CORS — allow all origins
+# CORS
+cors_origins_str = os.getenv("CORS_ORIGINS", "*" if ENVIRONMENT != "production" else "")
+origins = [origin.strip() for origin in cors_origins_str.split(",") if origin.strip()]
+
+if ENVIRONMENT == "production":
+    if not origins or "*" in origins:
+        raise ValueError("CORS_ORIGINS must be explicitly provided in production and cannot be '*'.")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
+    allow_origins=origins,
+    allow_credentials=True if ENVIRONMENT == "production" else False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.middleware("http")
+async def add_request_id(request: Request, call_next):
+    request_id = str(uuid.uuid4())
+    start_time = time.time()
+    
+    # We can inject request_id into context vars if needed, but for now just logging it
+    logger.info(f"Req_ID: {request_id} | {request.method} {request.url.path} started")
+    
+    response = await call_next(request)
+    
+    process_time = time.time() - start_time
+    logger.info(f"Req_ID: {request_id} | {request.method} {request.url.path} completed | Status: {response.status_code} | Duration: {process_time:.4f}s")
+    
+    response.headers["X-Request-ID"] = request_id
+    return response
 
 
 # Register routes
 app.include_router(rti_router)
 app.include_router(legal_router)
+app.include_router(auth_router)
+app.include_router(cases_router)
+app.include_router(authorities_router)
+app.include_router(admin_authorities_router)
 from routes.pdf_analysis import router as pdf_analysis_router
 from routes.document_drafting import router as document_drafting_router
 from routes.company_registration import router as company_registration_router
@@ -178,6 +211,8 @@ async def telegram_webhook(request: Request):
 @app.get("/debug/webhook", include_in_schema=False)
 async def debug_webhook():
     """Debug endpoint — check webhook status."""
+    if ENVIRONMENT != "development":
+        return Response(status_code=403, content="Forbidden")
     if not _telegram_app:
         return {"error": "Telegram bot not initialized", "token_set": bool(os.getenv("TELEGRAM_TOKEN"))}
     try:
@@ -195,6 +230,8 @@ async def debug_webhook():
 @app.get("/admin/set-webhook", include_in_schema=False)
 async def admin_set_webhook():
     """Manually trigger webhook registration."""
+    if ENVIRONMENT != "development":
+        return Response(status_code=403, content="Forbidden")
     if not _telegram_app:
         return {"error": "Telegram bot not initialized"}
     try:
@@ -208,6 +245,8 @@ async def admin_set_webhook():
 @app.get("/debug/ping-telegram", include_in_schema=False)
 async def ping_telegram():
     """Test if HF Space can reach api.telegram.org using requests (sync)."""
+    if ENVIRONMENT != "development":
+        return Response(status_code=403, content="Forbidden")
     import requests as req
     results = {}
     try:

@@ -101,68 +101,12 @@ class TestHealthEndpoints:
 
 
 class TestRTIGenerate:
-    @patch("routes.rti.classify_intent", side_effect=mock_intent)
-    @patch("routes.rti.resolve_pio", side_effect=mock_pio)
-    @patch("routes.rti.generate_draft", side_effect=mock_draft)
-    @patch("routes.rti.check_quality", side_effect=mock_quality)
-    def test_ration_card_rejection(self, *mocks):
-        """Scenario 1: Ration card rejection reason"""
+    def test_legacy_endpoint_deprecated(self):
+        """Legacy /rti/generate should return 410 Gone"""
         response = client.post("/rti/generate", json={
             "description": "My ration card application was rejected 3 months ago and I want to know the exact reason and which officer rejected it.",
             "language": "english",
             "state": "Maharashtra"
         })
-        assert response.status_code == 200
-        data = response.json()
-        assert "draft" in data
-        assert "[APPLICANT_NAME]" in data["draft"]
-        assert data["quality_score"] >= 70
-        assert data["is_valid"] is True
-        assert data["confidence"] > 0.5
-
-    def test_missing_description(self):
-        """Should fail with 422 for missing required field"""
-        response = client.post("/rti/generate", json={
-            "language": "english"
-        })
-        assert response.status_code == 422
-
-    def test_description_too_short(self):
-        """Should fail with 422 for description under 20 chars"""
-        response = client.post("/rti/generate", json={
-            "description": "RTI about PAN",
-        })
-        assert response.status_code == 422
-
-    @patch("routes.rti.classify_intent", side_effect=mock_intent)
-    @patch("routes.rti.resolve_pio", side_effect=mock_pio)
-    @patch("routes.rti.generate_draft", side_effect=mock_draft)
-    @patch("routes.rti.check_quality", side_effect=mock_quality)
-    def test_hindi_language_flag(self, *mocks):
-        """Scenario 2: Hindi language request"""
-        response = client.post("/rti/generate", json={
-            "description": "I want to know why my land mutation application is pending for 6 months in the revenue department.",
-            "language": "hindi",
-        })
-        assert response.status_code == 200
-
-    @patch("routes.rti.classify_intent", side_effect=mock_intent)
-    @patch("routes.rti.resolve_pio", side_effect=mock_pio)
-    @patch("routes.rti.generate_draft", side_effect=mock_draft)
-    @patch("routes.rti.check_quality", side_effect=mock_quality)
-    def test_response_structure_completeness(self, *mocks):
-        """All required fields must be present in response"""
-        response = client.post("/rti/generate", json={
-            "description": "I want to know the salary slips of all grade A officers in my district for last 3 months.",
-        })
-        assert response.status_code == 200
-        data = response.json()
-
-        required_fields = [
-            "draft", "filing_instructions", "department", "ministry",
-            "government_level", "information_needed", "urgency",
-            "pio_details", "quality_score", "is_valid", "warnings",
-            "suggestions", "exempt_risk", "estimated_success_probability", "confidence"
-        ]
-        for field in required_fields:
-            assert field in data, f"Missing field: {field}"
+        assert response.status_code == 410
+        assert "deprecated" in response.json()["detail"].lower()

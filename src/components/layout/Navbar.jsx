@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
 
-const Navbar = ({ activeTab, setActiveTab }) => {
+const Navbar = ({ activeTab, setActiveTab, onOpenAuth }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLegalMenuOpen, setIsLegalMenuOpen] = useState(false);
   const [isBellOpen, setIsBellOpen] = useState(false);
+  const { user, logout } = useAuth();
 
   const showPage = (page) => {
     setActiveTab(page);
@@ -108,6 +110,17 @@ const Navbar = ({ activeTab, setActiveTab }) => {
         <button onClick={toggleUILanguage} className="px-4 py-2 text-sm font-medium rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors md:ml-2">
           🌐 हिन्दी
         </button>
+
+        {/* Auth Button */}
+        {user ? (
+          <button onClick={logout} className="px-4 py-2 text-sm font-bold rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors md:ml-2">
+            Log out
+          </button>
+        ) : (
+          <button onClick={onOpenAuth} className="px-4 py-2 text-sm font-bold rounded-lg bg-rti-blue text-white hover:bg-blue-700 shadow-md transition-colors md:ml-2">
+            Login / Register
+          </button>
+        )}
 
         {/* Bell Icon */}
         <div className="relative">

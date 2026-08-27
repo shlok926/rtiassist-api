@@ -7,28 +7,6 @@ const DraftResult = ({ data, onReset }) => {
   
   if (!data) return null;
 
-  const handleSaveToTracker = () => {
-    try {
-      const existingStr = localStorage.getItem('rti_tracker');
-      const existing = existingStr ? JSON.parse(existingStr) : [];
-      
-      const newRTI = {
-        id: Date.now().toString(),
-        department: data.department || 'Unknown Department',
-        description: data.information_needed || 'RTI Application',
-        date: new Date().toISOString(),
-        status: 'filed',
-        draft: data.draft,
-        quality: data.quality_score
-      };
-      
-      localStorage.setItem('rti_tracker', JSON.stringify([newRTI, ...existing]));
-      alert('✅ Saved to My RTIs Tracker successfully!');
-    } catch (e) {
-      console.error(e);
-      alert('Failed to save to tracker');
-    }
-  };
 
   const handleDownloadPDF = async () => {
     setIsDownloading(true);
@@ -91,12 +69,6 @@ const DraftResult = ({ data, onReset }) => {
         </a>
       )}
 
-      <button 
-        onClick={handleSaveToTracker}
-        className="w-full mb-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold rounded-xl transition-colors border border-gray-300"
-      >
-        📋 Save to My RTIs Tracker
-      </button>
 
       {/* Scores Grid */}
       <div className="grid grid-cols-3 gap-4 mb-8">

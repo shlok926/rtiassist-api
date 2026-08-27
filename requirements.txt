@@ -10,3 +10,9 @@ aiohttp
 reportlab
 pdfplumber
 python-multipart
+sqlalchemy
+python-jose
+passlib[bcrypt]
+alembic
+psycopg2-binary
+pytesseract

@@ -8,29 +8,10 @@ const Settings = () => {
   const [showFeedbackSuccess, setShowFeedbackSuccess] = useState(false);
   const [openFaq, setOpenFaq] = useState(null);
 
-  // Load from local storage
-  useEffect(() => {
-    const saved = localStorage.getItem('rti_profile');
-    if (saved) {
-      try { setProfile(JSON.parse(saved)); } catch (e) {}
-    }
-  }, []);
-
-  const handleChange = (e) => {
-    setProfile(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleSave = () => {
-    localStorage.setItem('rti_profile', JSON.stringify(profile));
-    alert('✅ Profile saved successfully!');
-  };
-
-  const handleClear = () => {
-    if (window.confirm('Are you sure you want to clear all data including tracked RTIs and profile?')) {
-      localStorage.removeItem('rti_profile');
-      localStorage.removeItem('rti_tracker');
-      setProfile({ name: '', phone: '', email: '', address: '', city: '', pincode: '', state: '' });
-      alert('🗑️ All data cleared.');
+    const handleClear = () => {
+    if (window.confirm('Are you sure you want to clear your local session?')) {
+      localStorage.removeItem('token');
+      window.location.reload();
     }
   };
 
@@ -61,59 +42,13 @@ const Settings = () => {
         <p className="text-gray-600">Save your details to auto-fill RTI applications. All data is stored locally in your browser.</p>
       </div>
 
-      {/* Personal Details */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8 mb-8">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4 border-b border-gray-100">
-          <div>
-            <h3 className="text-xl font-bold text-gray-900 mb-1">👤 Personal Details (Optional)</h3>
-            <p className="text-sm text-gray-500">These details will auto-populate in your RTI drafts to save time. Never sent to any server.</p>
-          </div>
-          <button onClick={handleSave} className="px-4 py-2 bg-gray-900 text-white font-bold rounded-lg hover:bg-gray-800 transition-colors whitespace-nowrap">
-            💾 Save Changes
-          </button>
-        </div>
-
-        <div className="space-y-4">
-          <div className="form-group">
-            <label className="block text-sm font-bold text-gray-700 mb-1">Full Name</label>
-            <input type="text" name="name" value={profile.name} onChange={handleChange} className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-rti-blue" placeholder="As per Aadhaar/official ID" />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Phone Number</label>
-              <input type="tel" name="phone" value={profile.phone} onChange={handleChange} className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-rti-blue" placeholder="+91 98765 43210" />
-            </div>
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Email Address</label>
-              <input type="email" name="email" value={profile.email} onChange={handleChange} className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-rti-blue" placeholder="your.email@example.com" />
-            </div>
-          </div>
-          <div className="form-group">
-            <label className="block text-sm font-bold text-gray-700 mb-1">Complete Address</label>
-            <textarea name="address" value={profile.address} onChange={handleChange} rows="2" className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-rti-blue resize-none" placeholder="House No., Street Name, Area, Landmark"></textarea>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">City</label>
-              <input type="text" name="city" value={profile.city} onChange={handleChange} className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-rti-blue" />
-            </div>
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">PIN Code</label>
-              <input type="text" name="pincode" value={profile.pincode} onChange={handleChange} className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-rti-blue" />
-            </div>
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">State</label>
-              <input type="text" name="state" value={profile.state} onChange={handleChange} className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-rti-blue" />
-            </div>
-          </div>
-        </div>
-
         <div className="mt-8 p-4 bg-red-50 border border-red-100 rounded-xl flex items-center justify-between">
           <div className="text-sm text-red-800">
-            <strong>Danger Zone:</strong> Clear all local data, including profile and saved RTIs.
+            <strong>Danger Zone:</strong> Clear local authentication session.
           </div>
           <button onClick={handleClear} className="px-4 py-2 bg-white text-red-600 border border-red-200 font-bold rounded-lg hover:bg-red-50 transition-colors">
-            🗑️ Clear Data
+            🗑️ Logout
           </button>
         </div>
       </div>

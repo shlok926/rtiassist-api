@@ -1,5 +1,6 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
+from datetime import datetime, date
 
 
 class RTIRequest(BaseModel):
@@ -69,3 +70,358 @@ class HealthResponse(BaseModel):
     version: str
     model: str
     endpoints: List[str]
+
+# --- Phase 2 Schemas ---
+from datetime import datetime
+from pydantic import ConfigDict
+
+class CaseEventResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: str
+    event_type: str
+    description: str
+    created_at: datetime
+    metadata_json: Optional[str] = None
+
+class DocumentMetadataResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: str
+    document_type: str
+    title: Optional[str] = None
+    created_at: datetime
+    mime_type: Optional[str] = None
+
+class CaseResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: str
+    status: str
+    problem_description: str
+    title: Optional[str] = None
+    priority: Optional[str] = None
+    recommended_action: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+    events: Optional[List[CaseEventResponse]] = None
+    documents: Optional[List[DocumentMetadataResponse]] = None
+    
+    # Phase 6 Summary Fields
+    filing_date: Optional[date] = None
+    next_deadline: Optional[date] = None
+    remaining_days: Optional[int] = None
+    overdue: Optional[bool] = None
+    
+    # Phase 13: Case Intelligence
+    case_objective: Optional[str] = None
+    extracted_facts: Optional[str] = None
+    facts_confirmed: Optional[str] = None
+    next_action_recommendation: Optional[str] = None
+    response_analyses: Optional[List['ResponseAnalysisResponse']] = None
+    appeals: Optional[List['AppealResponse']] = None
+
+class CaseListResponse(BaseModel):
+    cases: List[CaseResponse]
+    total: int
+
+class CaseCreate(BaseModel):
+    problem_description: str = Field(..., description="Description of the citizen's problem")
+    title: Optional[str] = Field(None, description="Optional title for the case")
+
+class CaseUpdate(BaseModel):
+    status: Optional[str] = None
+    title: Optional[str] = None
+    priority: Optional[str] = None
+    recommended_action: Optional[str] = None
+    case_objective: Optional[str] = None
+    extracted_facts: Optional[str] = None
+    facts_confirmed: Optional[str] = None
+
+class TrackerImport(BaseModel):
+    id: str
+    date: str
+    department: str
+    description: str
+    status: str
+
+# --- Phase 3 Schemas ---
+
+class ActionRecommendation(BaseModel):
+    recommended_action: str
+    confidence: float
+    objective: str
+    reasoning: List[str]
+    alternative_actions: List[str]
+    missing_information: List[str]
+    required_documents: List[str]
+    urgency: str
+    supported: bool
+    warnings: List[str]
+    extracted_facts: Optional[dict] = None
+
+class ActionConfirmation(BaseModel):
+    action: str
+
+# --- Phase 4 Schemas ---
+
+class AuthoritySource(BaseModel):
+    title: Optional[str] = None
+    url: str
+
+class AuthorityResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: str
+    department: str
+    ministry: Optional[str] = None
+    government_level: str
+    state: Optional[str] = None
+    district: Optional[str] = None
+    pio_designation: Optional[str] = None
+    address: Optional[str] = None
+    online_portal: Optional[str] = None
+    verification_status: str
+    source_url: str
+    source_title: Optional[str] = None
+    last_verified: datetime
+
+class AuthoritySearchResponse(BaseModel):
+    results: List[AuthorityResponse]
+
+class AuthorityResolution(BaseModel):
+    match_status: str # MATCHED, MULTIPLE_MATCHES, NO_MATCH, NEEDS_REVIEW
+    authority_id: Optional[str] = None
+    confidence: str # HIGH, MEDIUM, LOW
+    verification_status: Optional[str] = None
+    reason: str
+    warnings: List[str] = []
+    missing_information: List[str] = []
+
+# --- Phase 5 Schemas ---
+
+class VerifiedAuthorityContext(BaseModel):
+    department: str
+    ministry: Optional[str] = None
+    government_level: str
+    state: Optional[str] = None
+    district: Optional[str] = None
+    pio_designation: Optional[str] = None
+    appellate_authority_designation: Optional[str] = None
+    address: Optional[str] = None
+    filing_fee: Optional[str] = None
+    payment_methods: Optional[str] = None
+    online_portal: Optional[str] = None
+    source_url: str
+    last_verified: datetime
+    verification_status: str
+
+class DocumentGenerateRequest(BaseModel):
+    language: str = "english"
+
+class DocumentQualityResult(BaseModel):
+    is_valid: bool
+    score: int
+    issues: List[str] = []
+    suggestions: List[str] = []
+    exempt_risk: Optional[str] = None
+    reviewer_notes: Optional[str] = None
+
+class DocumentResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: str
+    case_id: str
+    document_type: str
+    status: str
+    title: Optional[str] = None
+    content: Optional[str] = None
+    language: str
+    version: str
+    quality_score: Optional[str] = None
+    authority_snapshot: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+
+# --- Phase 6 Schemas ---
+class FilingCreate(BaseModel):
+    filing_date: date
+    filing_method: str
+    reference_number: Optional[str] = None
+    notes: Optional[str] = None
+
+class FilingResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: str
+    case_id: str
+    document_id: str
+    filing_date: date
+    filing_method: str
+    reference_number: Optional[str] = None
+    acknowledgement_number: Optional[str] = None
+    notes: Optional[str] = None
+    created_at: datetime
+
+class DeadlineResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: str
+    case_id: str
+    filing_id: str
+    deadline_type: str
+    trigger_date: date
+    due_date: date
+    status: str
+    completed_at: Optional[datetime] = None
+    created_at: datetime
+
+class CaseTimelineResponse(BaseModel):
+    filing: Optional[FilingResponse] = None
+    deadlines: List[DeadlineResponse] = []
+    events: List[CaseEventResponse] = []
+    current_status: str
+    remaining_days: Optional[int] = None
+
+# --- Phase 7 Schemas ---
+class RequestMapping(BaseModel):
+    request_text: str
+    status: str
+    evidence_excerpt: Optional[str] = None
+    page_number: Optional[int] = None
+    is_ocr_derived: Optional[bool] = None
+
+class ResponseAnalysisResult(BaseModel):
+    status: str
+    answered: List[str]
+    not_answered: List[str]
+    recommended_action: str
+    request_mapping: List[RequestMapping] = []
+    review_required: Optional[bool] = False
+
+class ResponseAnalysisResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: str
+    case_id: str
+    document_id: str
+    status: str
+    answered: List[str]
+    not_answered: List[str]
+    recommended_action: str
+    request_mapping: Optional[List[RequestMapping]] = []
+    created_at: datetime
+
+# --- Phase 8 Schemas ---
+class AppealConfirmRequest(BaseModel):
+    appeal_type: str
+
+class AppealResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: str
+    case_id: str
+    appeal_type: str
+    status: str
+    parent_document_id: str
+    parent_response_document_id: str
+    response_analysis_id: str
+    appellate_authority_id: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+
+# --- Phase 9 Schemas ---
+class UserRegisterRequest(BaseModel):
+    email: str
+    password: str
+
+class UserLoginRequest(BaseModel):
+    email: str
+    password: str
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
+class UserProfileResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: str
+    email: str
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    is_active: bool
+    is_verified: bool
+    role: str
+    created_at: datetime
+
+# --- Phase 11 Schemas ---
+class AuthorityVerificationRequest(BaseModel):
+    source_url: str
+    source_type: str
+    notes: Optional[str] = None
+
+class AuthorityUnverificationRequest(BaseModel):
+    reason: str
+    new_status: str = "NEEDS_REVIEW"
+
+class AuthorityHistoryResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: str
+    authority_id: str
+    source_url: str
+    source_type: str
+    verification_status: str
+    verified_at: datetime
+    verified_by: str
+    notes: Optional[str] = None
+
+class AuthorityCreateRequest(BaseModel):
+    department: str
+    government_level: str
+    source_url: str
+    source_type: str
+    ministry: Optional[str] = None
+    state: Optional[str] = None
+    district: Optional[str] = None
+    pio_designation: Optional[str] = None
+    address: Optional[str] = None
+    online_portal: Optional[str] = None
+    filing_fee: Optional[str] = None
+    verification_notes: Optional[str] = None
+
+class AuthorityUpdateRequest(BaseModel):
+    department: Optional[str] = None
+    government_level: Optional[str] = None
+    ministry: Optional[str] = None
+    state: Optional[str] = None
+    district: Optional[str] = None
+    pio_designation: Optional[str] = None
+    address: Optional[str] = None
+    online_portal: Optional[str] = None
+    filing_fee: Optional[str] = None
+
+class AuthorityImportRecord(BaseModel):
+    department: str
+    government_level: str
+    source_url: str
+    source_type: str
+    ministry: Optional[str] = None
+    state: Optional[str] = None
+    district: Optional[str] = None
+    office_name: Optional[str] = None
+    pio_designation: Optional[str] = None
+    pio_name: Optional[str] = None
+    appellate_authority_designation: Optional[str] = None
+    address: Optional[str] = None
+    online_portal: Optional[str] = None
+    filing_fee: Optional[str] = None
+    payment_methods: Optional[str] = None
+    verification_status: Optional[str] = "UNVERIFIED"
+    verification_notes: Optional[str] = None
+
+class AuthorityImportResult(BaseModel):
+    index: int
+    status: str # IMPORTED, REJECTED, POSSIBLE_DUPLICATE
+    reason: Optional[str] = None
+    authority_id: Optional[str] = None
+
+class AuthorityImportRequest(BaseModel):
+    records: List[AuthorityImportRecord]
+
+class AuthorityImportResponse(BaseModel):
+    total_processed: int
+    imported: int
+    rejected: int
+    possible_duplicates: int
+    results: List[AuthorityImportResult]

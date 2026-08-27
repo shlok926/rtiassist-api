@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import DraftResult from './DraftResult';
 import LanguageModal from './LanguageModal';
+import { apiFetch } from '../../utils/api';
+import { useAuth } from '../../context/AuthContext';
 
-const RTIForm = ({ setActiveTab }) => {
+const RTIForm = ({ setActiveTab, onOpenAuth, setSelectedCaseId }) => {
+  const { user } = useAuth();
   const [description, setDescription] = useState('');
   const [state, setState] = useState('');
   const [category, setCategory] = useState('');
@@ -32,6 +35,10 @@ const RTIForm = ({ setActiveTab }) => {
       alert("Please describe what information you need.");
       return;
     }
+    if (!user) {
+      onOpenAuth();
+      return;
+    }
     setIsLangModalOpen(true);
   };
 
@@ -42,25 +49,30 @@ const RTIForm = ({ setActiveTab }) => {
     setResultData(null);
     
     try {
-      const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
-      const response = await fetch(`${API_BASE_URL}/rti/generate`, {
+      // 1. Create Case
+      let res = await apiFetch('/cases', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          description: description,
-          state: state || null,
-          language: selectedLanguage,
-          demo_mode: true // Force demo mode for instant responses
-        }),
+          problem_description: description + (state ? ` (State: ${state})` : ''),
+          title: 'New RTI Application'
+        })
       });
+      if (!res.ok) throw new Error("Failed to create case");
+      let caseData = await res.json();
+      const caseId = caseData.id;
+
+      // 2. Recommend Action (Initial understanding)
+      res = await apiFetch(`/cases/${caseId}/recommend-action`, { method: 'POST' });
+      if (!res.ok) throw new Error("Failed to recommend action");
       
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.detail || 'Failed to generate RTI application');
+      // 3. Redirect to Case Detail for Citizen Journey
+      if (setSelectedCaseId) {
+        setSelectedCaseId(caseId);
+      }
+      if (setActiveTab) {
+        setActiveTab('case-detail');
       }
       
-      setResultData(data);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -203,7 +215,7 @@ const RTIForm = ({ setActiveTab }) => {
         ) : resultData ? (
           "✅ Generated Successfully"
         ) : (
-          "⚡ Generate RTI Application — Free"
+          "⚡ Start Citizen Journey — Free"
         )}
       </button>
 

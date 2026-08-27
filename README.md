@@ -27,6 +27,11 @@
 
 Over **65 million RTI applications** are filed in India every year — yet most citizens struggle to:
 
+- **Phase 12**: Audit & Production Readiness
+- **Phase 13**: Real-World Case Intelligence (Facts, Actions, Mapping)
+- **Phase 14**: Citizen Experience Layer (Central UI Workspace)
+- **Phase 15**: Real-World Validation & Product Hardening
+
 - Identify the **correct government department** to address
 - Draft a **legally correct application** under RTI Act 2005
 - Understand what information is **legally accessible** vs. exempt
@@ -214,8 +219,8 @@ Citizen plain-language input
          │
          ▼
 ┌─────────────────────┐
-│  Layer 1: Intent    │  ← ASI-1 #1 — Identifies department, ministry, RTI sections
-│  Classifier         │
+│  Layer 1: Action    │  ← ASI-1 #1 — Recommends action (RTI, Grievance, etc.), extracts facts
+│  Recommender        │
 └──────────┬──────────┘
            ▼
 ┌─────────────────────┐
@@ -336,7 +341,6 @@ RTIAssist is an informational and productivity tool designed to help Indian citi
 - Generated drafts should be **reviewed before submission**
 - RTIAssist is **not liable** for outcomes of filed applications
 - For complex legal matters, consult a qualified RTI activist or advocate
-- Information about Section 8 exemptions is indicative — final decisions rest with PIOs and Information Commissions
 - **BPL cardholders are exempt from filing fees** — carry BPL card copy when filing in person
 
 ---

@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useAuth } from './context/AuthContext';
+import AuthModal from './components/auth/AuthModal';
 import Navbar from './components/layout/Navbar';
 import RTIForm from './components/rti/RTIForm';
 import Tracker from './components/tracker/Tracker';
@@ -13,13 +15,22 @@ import FeesCalculator from './components/info/FeesCalculator';
 import About from './components/info/About';
 import ExamplesLibrary from './components/info/ExamplesLibrary';
 import Settings from './components/info/Settings';
+import CaseDetail from './components/case/CaseDetail';
 
 function App() {
   const [activeTab, setActiveTab] = useState('home');
+  const [selectedCaseId, setSelectedCaseId] = useState(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const { user, loading } = useAuth();
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
-      <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Navbar 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab} 
+        onOpenAuth={() => setIsAuthModalOpen(true)}
+      />
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
       
       <main className="flex-grow flex flex-col items-center p-4 md:p-8 space-y-8">
         
@@ -39,11 +50,12 @@ function App() {
             </div>
 
             {/* The Generator Form */}
-            <RTIForm setActiveTab={setActiveTab} />
+            <RTIForm setActiveTab={setActiveTab} setSelectedCaseId={setSelectedCaseId} onOpenAuth={() => setIsAuthModalOpen(true)} />
           </>
         )}
 
-        {activeTab === 'tracker' && <Tracker />}
+        {activeTab === 'tracker' && <Tracker setActiveTab={setActiveTab} setSelectedCaseId={setSelectedCaseId} />}
+        {activeTab === 'case-detail' && <CaseDetail caseId={selectedCaseId} setActiveTab={setActiveTab} />}
         {activeTab === 'legaltools' && <LegalToolsHub setActiveTab={setActiveTab} />}
         {activeTab === 'second-appeal' && <SecondAppeal setActiveTab={setActiveTab} />}
         {activeTab === 'consumer-court' && <ConsumerCourt setActiveTab={setActiveTab} />}

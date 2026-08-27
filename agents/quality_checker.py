@@ -1,5 +1,6 @@
 import json
 from utils.asi1_client import call_asi1
+from utils.llm_parser import parse_llm_json
 from prompts.system_prompts import QUALITY_CHECKER
 
 
@@ -21,12 +22,8 @@ def check_quality(draft: str) -> dict:
         max_tokens=600,
     )
 
-    try:
-        clean = raw.strip().strip("```json").strip("```").strip()
-        result = json.loads(clean)
-    except json.JSONDecodeError:
-        # Safe fallback — don't block the pipeline if quality check fails
-        result = {
+    def get_fallback():
+        return {
             "is_valid": True,
             "score": 70,
             "issues": ["Automated quality check could not parse response — please review manually."],
@@ -36,6 +33,8 @@ def check_quality(draft: str) -> dict:
             "estimated_success_probability": "medium",
             "reviewer_notes": "Quality check encountered a parsing error. Application may still be valid.",
         }
+
+    result = parse_llm_json(raw, default_factory=get_fallback)
 
     # Normalize score to int
     try:

@@ -1,40 +1,87 @@
 import React, { useState, useEffect } from 'react';
 import FirstAppealModal from '../rti/FirstAppealModal';
+import { useAuth } from '../../context/AuthContext';
+import { apiFetch } from '../../utils/api';
 
-const Tracker = () => {
+const Tracker = ({ setActiveTab, setSelectedCaseId }) => {
+  const { user } = useAuth();
   const [rtis, setRtis] = useState([]);
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
   const [isAppealModalOpen, setIsAppealModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Load from LocalStorage
   useEffect(() => {
-    const data = localStorage.getItem('rti_tracker');
-    if (data) {
-      try {
-        setRtis(JSON.parse(data));
-      } catch (e) {
-        console.error("Error parsing tracker data", e);
+    if (user) {
+      loadCases();
+    }
+  }, [user]);
+
+  const loadCases = async () => {
+    setIsLoading(true);
+    try {
+      // 1. Migrate legacy data if exists
+      const legacyData = localStorage.getItem('rti_tracker');
+      if (legacyData) {
+        try {
+          const parsed = JSON.parse(legacyData);
+          for (const item of parsed) {
+            await apiFetch('/cases/import', {
+              method: 'POST',
+              body: JSON.stringify(item)
+            });
+          }
+          localStorage.removeItem('rti_tracker');
+        } catch (e) {
+          console.error("Migration failed", e);
+        }
       }
-    }
-  }, []);
 
-  // Save to LocalStorage whenever RTIs change (if we implement delete/status update here)
-  const updateRTIs = (newRTIs) => {
-    setRtis(newRTIs);
-    localStorage.setItem('rti_tracker', JSON.stringify(newRTIs));
+      // 2. Load from backend
+      const res = await apiFetch('/cases');
+      if (res.ok) {
+        const data = await res.json();
+        // Map backend cases to frontend tracker format
+        const formatted = data.cases.map(c => ({
+          id: c.id,
+          date: c.filing_date || c.created_at,
+          department: c.title || c.problem_description.substring(0, 50) + '...',
+          description: c.problem_description,
+          status: getFrontendStatus(c.status),
+          backend_status: c.status,
+          next_deadline: c.next_deadline,
+          remaining_days: c.remaining_days,
+          overdue: c.overdue
+        }));
+        setRtis(formatted);
+      }
+    } catch (e) {
+      console.error("Failed to load cases", e);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const deleteRTI = (id) => {
-    if (window.confirm("Are you sure you want to delete this RTI?")) {
-      const newRTIs = rtis.filter(rti => rti.id !== id);
-      updateRTIs(newRTIs);
+  const getFrontendStatus = (backendStatus) => {
+    switch (backendStatus) {
+      case 'READY_TO_FILE': return 'pending';
+      case 'AWAITING_RESPONSE': return 'filed';
+      case 'RESPONSE_RECEIVED':
+      case 'ANALYSIS_READY': return 'received';
+      case 'APPEAL_RECOMMENDED':
+      case 'APPEAL_CONFIRMED':
+      case 'APPEAL_FILED': return 'pending';
+      default: return 'pending';
     }
   };
 
-  const updateStatus = (id, newStatus) => {
-    const newRTIs = rtis.map(rti => rti.id === id ? { ...rti, status: newStatus } : rti);
-    updateRTIs(newRTIs);
+  const deleteRTI = async (id) => {
+    // Delete API not strictly defined in Phase 2, omit or mock
+    alert("Delete operation must be performed via case settings.");
+  };
+
+  const updateStatus = async (id, newStatus) => {
+    alert("Status is managed automatically by the backend lifecycle.");
   };
 
   // Filter & Search Logic
@@ -57,19 +104,17 @@ const Tracker = () => {
     }
   };
 
-  const getDaysLeft = (dateStr) => {
-    const filedDate = new Date(dateStr);
-    const deadline = new Date(filedDate);
-    deadline.setDate(deadline.getDate() + 30);
-    const today = new Date();
-    const diffTime = deadline - today;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
-  };
-
   return (
     <div className="w-full max-w-5xl mx-auto p-4 md:p-8 animate-fade-in">
-      <div className="mb-8">
+      {!user ? (
+        <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 text-center flex flex-col items-center justify-center">
+          <div className="text-4xl mb-4">🔒</div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Authentication Required</h2>
+          <p className="text-gray-600 mb-6">Please log in to manage your RTI applications and track deadlines.</p>
+        </div>
+      ) : (
+        <>
+          <div className="mb-8">
         <h2 className="text-3xl font-black text-gray-900 mb-2">📋 My RTI Applications</h2>
         <p className="text-gray-600">Track all your filed RTIs. Search, filter, update status, and manage deadlines locally.</p>
       </div>
@@ -125,8 +170,8 @@ const Tracker = () => {
           </div>
         ) : (
           filteredRTIs.map((rti) => {
-            const daysLeft = getDaysLeft(rti.date);
-            const isLate = daysLeft < 0;
+            const isLate = rti.overdue;
+            const daysLeft = rti.remaining_days !== null ? rti.remaining_days : 0;
             return (
               <div key={rti.id} className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4 items-start md:items-center hover:shadow-md transition-shadow">
                 
@@ -143,12 +188,21 @@ const Tracker = () => {
 
                 <div className="flex flex-col md:items-end gap-3 w-full md:w-auto mt-4 md:mt-0 border-t md:border-t-0 border-gray-100 pt-4 md:pt-0">
                   <div className="text-center md:text-right flex flex-col gap-2">
-                    {(rti.status === 'filed' || rti.status === 'pending') && (
+                    {rti.remaining_days !== null && (
                       <div className={`text-sm font-bold ${isLate ? 'text-red-600' : 'text-orange-500'}`}>
                         {isLate ? `⚠️ ${Math.abs(daysLeft)} Days Overdue` : `⏰ ${daysLeft} Days Left`}
                       </div>
                     )}
-                    {isLate && (rti.status === 'filed' || rti.status === 'pending') && (
+                    <button 
+                      onClick={() => {
+                        setSelectedCaseId(rti.id);
+                        setActiveTab('case-detail');
+                      }}
+                      className="text-xs font-bold text-rti-blue bg-blue-50 hover:bg-blue-100 border border-blue-200 px-3 py-1 rounded transition-colors"
+                    >
+                      View Case
+                    </button>
+                    {rti.backend_status === 'ANALYSIS_READY' && (
                       <button 
                         onClick={() => setIsAppealModalOpen(true)}
                         className="text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 px-2 py-1 rounded transition-colors"
@@ -159,23 +213,12 @@ const Tracker = () => {
                   </div>
                   
                   <div className="flex gap-2">
-                    <select 
-                      value={rti.status}
-                      onChange={(e) => updateStatus(rti.id, e.target.value)}
-                      className="text-sm border border-gray-300 rounded-lg p-1.5 focus:ring-1 focus:ring-rti-blue"
-                    >
-                      <option value="filed">📝 Filed</option>
-                      <option value="pending">⏳ Pending</option>
-                      <option value="received">✅ Received</option>
-                      <option value="rejected">❌ Rejected</option>
-                      <option value="closed">🔒 Closed</option>
-                    </select>
                     <button 
                       onClick={() => deleteRTI(rti.id)}
                       className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                       title="Delete"
                     >
-                      🗑️
+                      🗑️ Delete
                     </button>
                   </div>
                 </div>
@@ -190,6 +233,8 @@ const Tracker = () => {
         isOpen={isAppealModalOpen} 
         onClose={() => setIsAppealModalOpen(false)} 
       />
+        </>
+      )}
     </div>
   );
 };
