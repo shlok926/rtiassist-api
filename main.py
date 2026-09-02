@@ -223,8 +223,8 @@ async def debug_webhook():
             "last_error_message": info.last_error_message,
             "last_error_date": str(info.last_error_date) if info.last_error_date else None,
         }
-    except Exception as e:
-        return {"error": str(e)}
+    except Exception:
+        return {"error": "Failed to retrieve webhook info"}
 
 
 @app.get("/admin/set-webhook", include_in_schema=False)
@@ -238,8 +238,8 @@ async def admin_set_webhook():
         await _register_webhook()
         info = await _telegram_app.bot.get_webhook_info()
         return {"success": True, "webhook_url": info.url}
-    except Exception as e:
-        return {"error": str(e)}
+    except Exception:
+        return {"error": "Failed to configure webhook"}
 
 
 @app.get("/debug/ping-telegram", include_in_schema=False)
@@ -252,6 +252,6 @@ async def ping_telegram():
     try:
         r = req.get("https://api.telegram.org", timeout=8)
         results["requests_sync"] = f"OK {r.status_code}"
-    except Exception as e:
-        results["requests_sync"] = f"FAIL: {e}"
+    except Exception:
+        results["requests_sync"] = "FAIL: Connection error"
     return results
