@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/shlok926/rtiassist-api#readme",
   "devDependencies": {
-    "@vitejs/plugin-react": "^6.1.0",
+    "@vitejs/plugin-react": "^6.1.1",
     "autoprefixer": "^10.5.4",
     "jsdom": "^30.0.1",
     "postcss": "^8.5.26",
