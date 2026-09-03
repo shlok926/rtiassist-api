@@ -237,3 +237,37 @@ def register_official_source(
     db.commit()
     db.refresh(source)
     return source
+
+@router.get("/sources/monitoring/status")
+def get_monitoring_status(
+    db: Session = Depends(get_db),
+    admin: User = Depends(get_admin_user),
+    skip: int = 0,
+    limit: int = 100
+):
+    """Admin-only operational visibility into the monitoring service."""
+    sources = db.query(OfficialAuthoritySource).offset(skip).limit(limit).all()
+    
+    return [{
+        "id": s.id,
+        "authority_id": s.authority_id,
+        "source_url": s.source_url,
+        "is_active": s.is_active,
+        "is_locked": s.is_locked,
+        "last_checked_at": s.last_checked_at,
+        "next_check_at": s.next_check_at,
+        "last_fetch_status": s.last_fetch_status,
+        "consecutive_failures": s.consecutive_failures,
+        "review_status": s.review_status
+    } for s in sources]
+
+@router.post("/sources/monitoring/trigger")
+async def trigger_monitoring_cycle(
+    limit: int = 10,
+    db: Session = Depends(get_db),
+    admin: User = Depends(get_admin_user)
+):
+    """Manually trigger a background monitoring cycle (bypasses loop wait)."""
+    from services.source_monitoring import SourceMonitoringService
+    results = await SourceMonitoringService.run_due_checks(db, limit=limit)
+    return results
