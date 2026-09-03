@@ -75,9 +75,46 @@ async def _get_telegram_app():
     return _telegram_app
 
 
+_monitoring_task = None
+
+async def _monitoring_loop():
+    from models.database import SessionLocal
+    from services.source_monitoring import SourceMonitoringService
+    interval_sec = int(os.getenv("MONITORING_LOOP_INTERVAL_SECONDS", "3600"))
+    
+    logger.info(f"Source monitoring scheduler started. Checking every {interval_sec}s.")
+    while True:
+        try:
+            db = SessionLocal()
+            try:
+                logger.info("Running scheduled source checks...")
+                results = await SourceMonitoringService.run_due_checks(db)
+                if results["processed"] > 0:
+                    logger.info(f"Monitoring cycle complete: {results}")
+            finally:
+                db.close()
+        except asyncio.CancelledError:
+            break
+        except Exception as e:
+            logger.error(f"Error in monitoring loop: {e}")
+        
+        await asyncio.sleep(interval_sec)
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    global _monitoring_task
+    if os.getenv("ENABLE_SOURCE_MONITORING", "false").lower() == "true":
+        _monitoring_task = asyncio.create_task(_monitoring_loop())
+        
     yield  # Nothing to do at startup — bot initializes lazily
+    
+    if _monitoring_task:
+        _monitoring_task.cancel()
+        try:
+            await _monitoring_task
+        except asyncio.CancelledError:
+            pass
+            
     if _telegram_app:
         await _telegram_app.stop()
         await _telegram_app.shutdown()

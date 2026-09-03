@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey
+from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, Integer
 from sqlalchemy.orm import relationship
 from models.database import Base
 from models.orm.base import BaseModel
@@ -12,11 +12,16 @@ class OfficialAuthoritySource(Base, BaseModel):
     
     is_active = Column(Boolean, default=True)
     
-    # Fetch Status
     last_fetch_status = Column(String, nullable=True) # SUCCESS, FAILED, TIMEOUT, UNAVAILABLE
     last_fetch_error = Column(String, nullable=True)
     last_successful_fetch_at = Column(DateTime(timezone=True), nullable=True)
     last_checked_at = Column(DateTime(timezone=True), nullable=True)
+    
+    # Scheduling & Monitoring
+    next_check_at = Column(DateTime(timezone=True), nullable=True, index=True)
+    consecutive_failures = Column(Integer, default=0)
+    is_locked = Column(Boolean, default=False, index=True)
+    locked_at = Column(DateTime(timezone=True), nullable=True)
     
     # Parsing & Intelligence
     last_parse_status = Column(String, nullable=True) # PARSED, UNPARSEABLE, UNSUPPORTED
