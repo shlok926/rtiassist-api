@@ -32,7 +32,7 @@ class SourceMonitoringService:
         # Or locked more than 1 hour ago (stale lock recovery)
         stale_lock_threshold = now - timedelta(hours=1)
         
-        due_sources = db.query(OfficialAuthoritySource).filter(
+        due_source_ids = db.query(OfficialAuthoritySource.id).filter(
             OfficialAuthoritySource.is_active == True,
             or_(
                 OfficialAuthoritySource.is_locked == False,
@@ -44,37 +44,31 @@ class SourceMonitoringService:
             )
         ).limit(limit).all()
         
-        if not due_sources:
+        if not due_source_ids:
             return {"processed": 0, "success": 0, "failed": 0}
             
-        # 2. Lock them immediately (Basic concurrency protection)
-        source_ids = []
-        for src in due_sources:
-            src.is_locked = True
-            src.locked_at = now
-            source_ids.append(src.id)
+        # Extract scalar IDs
+        source_ids = [row[0] for row in due_source_ids]
+            
+        # 2. Lock them atomically (Basic concurrency protection)
+        updated_count = db.query(OfficialAuthoritySource).filter(
+            OfficialAuthoritySource.id.in_(source_ids),
+            or_(
+                OfficialAuthoritySource.is_locked == False,
+                OfficialAuthoritySource.locked_at < stale_lock_threshold
+            )
+        ).update({"is_locked": True, "locked_at": now}, synchronize_session='fetch')
         
         db.commit()
         
-        logger.info(f"Locked {len(source_ids)} sources for monitoring.")
+        # If another worker locked them first, updated_count might be less.
+        # We only process the ones we successfully locked.
+        # Actually, to be safe, we just process source_ids and check is_locked == True and locked_at == now.
         
-        # 3. Process concurrently with a semaphore
-        semaphore = asyncio.Semaphore(max_concurrency)
+        logger.info(f"Atomically locked {updated_count} sources for monitoring.")
         
         success_count = 0
         failed_count = 0
-        
-        async def process_source(source_id: str):
-            nonlocal success_count, failed_count
-            async with semaphore:
-                # We need a fresh session context or careful management if using one session.
-                # Since check_source handles its own commits on the session, we'll use the shared one 
-                # but we must be aware of concurrent commits. 
-                # In SQLAlchemy, concurrent async operations on the SAME session are dangerous.
-                # To be absolutely safe for Alpha, we'll process them sequentially in this loop, 
-                # or we require a session factory. 
-                # Given FastAPI usually provides 1 session per request/task, sequential is safer for DB.
-                pass
                 
         # To avoid SQLite concurrency issues on the shared session, we'll process sequentially for now.
         # This guarantees atomicity per source without session tearing.
@@ -83,6 +77,17 @@ class SourceMonitoringService:
                 # Fetch fresh from DB
                 src = db.query(OfficialAuthoritySource).filter(OfficialAuthoritySource.id == source_id).first()
                 if not src:
+                    continue
+                
+                # Check if we actually acquired the lock
+                if not src.is_locked:
+                    continue
+                    
+                # Handle SQLite dropping tzinfo
+                src_locked_at = src.locked_at.replace(tzinfo=timezone.utc) if src.locked_at and src.locked_at.tzinfo is None else src.locked_at
+                
+                # Check if the lock was acquired by us just now (within 5 seconds to account for precision loss)
+                if not src_locked_at or abs((src_locked_at - now).total_seconds()) > 5:
                     continue
                     
                 updated_source = await SourceIntelligence.check_source(db, source_id)
