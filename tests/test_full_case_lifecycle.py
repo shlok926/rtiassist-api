@@ -140,6 +140,7 @@ def test_cross_tenant_idor(auth_header_a, auth_header_b):
     """Test that User B cannot access User A's case resources."""
     # User A creates a case
     response = client.post("/cases", json={"problem_description": "IDOR Test"}, headers=auth_header_a)
+    assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
     case_id = response.json()["id"]
     
     # User B attempts to access User A's case

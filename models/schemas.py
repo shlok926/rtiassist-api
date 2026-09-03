@@ -425,3 +425,48 @@ class AuthorityImportResponse(BaseModel):
     rejected: int
     possible_duplicates: int
     results: List[AuthorityImportResult]
+
+# --- Phase 17 Schemas (Source Intelligence) ---
+class OfficialAuthoritySourceResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: str
+    authority_id: str
+    source_url: str
+    source_type: str
+    is_active: bool
+    last_fetch_status: Optional[str] = None
+    last_fetch_error: Optional[str] = None
+    last_successful_fetch_at: Optional[datetime] = None
+    last_checked_at: Optional[datetime] = None
+    last_parse_status: Optional[str] = None
+    last_content_hash: Optional[str] = None
+    last_extracted_text: Optional[str] = None
+    previous_extracted_text: Optional[str] = None
+    diff_summary: Optional[str] = None
+    review_status: str
+
+class SourceDecisionRequest(BaseModel):
+    decision: str # IRRELEVANT_CHANGE or AUTHORITY_CHANGED
+    notes: Optional[str] = None
+
+class ProposedAuthorityChangeResponse(BaseModel):
+    id: str
+    source_id: str
+    authority_id: str
+    field_name: str
+    old_value: Optional[str] = None
+    proposed_value: Optional[str] = None
+    evidence_snippet: Optional[str] = None
+    change_type: str
+    confidence: str
+    review_status: str
+    created_at: datetime
+    reviewed_by: Optional[str] = None
+    reviewed_at: Optional[datetime] = None
+    review_notes: Optional[str] = None
+    
+    model_config = ConfigDict(from_attributes=True)
+
+class ProposedAuthorityChangeReviewRequest(BaseModel):
+    decision: str # ACCEPT, REJECT, MARK_AMBIGUOUS
+    notes: Optional[str] = None

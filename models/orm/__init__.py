@@ -7,4 +7,6 @@ from models.orm.filing import Filing
 from models.orm.deadline import Deadline
 from models.orm.response_analysis import ResponseAnalysis
 from models.orm.appeal import Appeal
-from models.orm.deadline_rule import DeadlineRule
+from .deadline import Deadline
+from .deadline_rule import DeadlineRule
+from .source_registry import OfficialAuthoritySource, ProposedAuthorityChange
