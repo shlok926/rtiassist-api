@@ -4,6 +4,8 @@ pydantic
 requests
 python-dotenv
 pytest
+pytest-mock
+pytest-asyncio
 httpx
 python-telegram-bot[webhooks]
 aiohttp
