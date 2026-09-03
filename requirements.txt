@@ -4,6 +4,8 @@ pydantic
 requests
 python-dotenv
 pytest
+pytest-mock
+pytest-asyncio
 httpx
 python-telegram-bot[webhooks]
 aiohttp
@@ -19,3 +21,5 @@ psycopg2-binary
 pytesseract
 fpdf
 pytest-asyncio
+beautifulsoup4
+httpx
