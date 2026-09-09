@@ -10,14 +10,10 @@ describe('RTI Assist Frontend Tests', () => {
       <div id="bellPanel"></div>
     `;
     
-    // Mock localStorage
-    const mockStorage = {};
-    global.localStorage = {
-      getItem: (key) => mockStorage[key] || null,
-      setItem: (key, val) => mockStorage[key] = String(val),
-      removeItem: (key) => delete mockStorage[key],
-      clear: () => { for (let key in mockStorage) delete mockStorage[key]; }
-    };
+    // Ensure localStorage is clean for each test
+    if (typeof localStorage !== 'undefined') {
+      localStorage.clear();
+    }
   });
 
   it('should have a working test environment', () => {
