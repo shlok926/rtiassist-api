@@ -20,5 +20,9 @@ test_features.py
 node_modules/
 dist/
 
+# Databases
+*.db
+*.sqlite3
+
 # Other
 pytest_output*.txt
