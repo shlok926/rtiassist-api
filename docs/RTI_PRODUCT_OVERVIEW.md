@@ -4,7 +4,7 @@
 
 **Complete guide to RTI in India, why RTIAssist exists, who uses it, and how it compares to alternatives.**
 
-[← Back to Main README](README.md)
+[← Back to Main README](../README.md)
 
 </div>
 
@@ -446,6 +446,6 @@ RTIAssist is an informational and productivity tool. It does **not** constitute 
 
 *Jan Shakti. Jan Jagruti. Jan Suchna.*
 
-[← Back to Main README](README.md)
+[← Back to Main README](../README.md)
 
 </div>
