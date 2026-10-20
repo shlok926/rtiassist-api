@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Created formal root-level `LICENSE.md` (MIT License) and `CONTRIBUTING.md`.
+- Added Contributor Covenant `CODE_OF_CONDUCT.md` (v2.1).
 - Consolidated release milestones and phase documentation into `CHANGELOG.md`.
 
 ---

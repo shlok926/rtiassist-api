@@ -4,9 +4,9 @@ Thank you for your interest in contributing to **RTIAssist**! We welcome contrib
 
 ---
 
-## 📜 Code of Conduct
+## Code of Conduct
 
-By participating in this project, you agree to treat all contributors with respect and professionalism.
+This project adheres to the Contributor Covenant. By participating, you are expected to uphold this code. Please review our [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for details on expected behavior and reporting guidelines.
 
 ---
 
