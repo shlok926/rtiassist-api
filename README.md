@@ -1,363 +1,487 @@
-
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/shlok926/rtiassist-api/main/rtiassist_logo.png" alt="RTIAssist Logo" width="300"/>
+<img src="https://raw.githubusercontent.com/shlok926/rtiassist-api/main/rtiassist_logo.png" alt="RTIAssist Logo" width="280"/>
 
-**RTIAssist — AI-Powered RTI & Legal Tools for Indian Citizens**
+### RTIAssist: AI-Powered RTI, Legal Tools and Case Lifecycle Platform
 
-🌐 [Website](https://shlok926.github.io/rtiassist-api) &nbsp;|&nbsp; 📖 [API Docs](#-api-reference) &nbsp;|&nbsp; 🤖 [Telegram Bot](#-telegram-bot) &nbsp;|&nbsp; ⚡ [Quick Start](#-quick-start) &nbsp;|&nbsp; 🤝 [Contributing](#-contributing)
+[Live Demo](https://shlok926.github.io/rtiassist-api) | [API Docs](#api-reference) | [Telegram Bot](#telegram-bot-integration) | [Quick Start](#quick-start) | [Contributing](CONTRIBUTING.md) | [Changelog](CHANGELOG.md)
 
 [![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python&logoColor=white)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![ASI-1](https://img.shields.io/badge/Powered%20by-ASI--1%20API-6B46C1)](https://asi1.ai)
-[![Telegram](https://img.shields.io/badge/Telegram-Bot-2CA5E0?logo=telegram&logoColor=white)](#-telegram-bot)
+[![React](https://img.shields.io/badge/Frontend-React%2019%20%2B%20Vite-61DAFB?logo=react&logoColor=black)](src/)
+[![Tests](https://img.shields.io/badge/Tests-117%20Passing-brightgreen?logo=pytest&logoColor=white)](tests/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)](Dockerfile)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE.md)
 
-> **India's most powerful AI-powered RTI application generator.**
-> Describe your problem in plain language — get a legally correct, ready-to-file RTI application in seconds.
+> India's legal-tech platform for automated Right to Information (RTI) drafting, Public Information Officer (PIO) authority resolution, statutory deadline tracking, and appeal generation.
 
-📖 **New to RTI?** Read the [Full RTI Overview, Use Cases & Competitor Comparison →](RTI_PRODUCT_OVERVIEW.md)
+Detailed product specifications and RTI guide: [Product Overview and Legal Guide](docs/RTI_PRODUCT_OVERVIEW.md)
 
 </div>
 
 ---
 
-## 🧩 Problem Statement
+## Overview
 
-Over **65 million RTI applications** are filed in India every year — yet most citizens struggle to:
+Over 65 million RTI applications are filed annually across India. Citizens and advocacy groups face systemic bottlenecks when exercising their rights under the RTI Act, 2005:
 
-- **Phase 12**: Audit & Production Readiness
-- **Phase 13**: Real-World Case Intelligence (Facts, Actions, Mapping)
-- **Phase 14**: Citizen Experience Layer (Central UI Workspace)
-- **Phase 15**: Real-World Validation & Product Hardening
+- **Public Authority Identification**: Identifying whether an issue falls under Central, State, or Municipal jurisdiction, and locating the competent PIO.
+- **Statutory Drafting Requirements**: Applications must formulate clear questions and request specific records without requesting opinions or attracting Section 8 exemptions.
+- **Language Barriers**: Legal portals and forms frequently restrict communication to formal Hindi or English.
+- **Strict Appeal Timelines**: Citizens regularly forfeit rights due to unmonitored statutory deadlines (30-day First Appeal under Section 19(1) and 90-day Second Appeal under Section 19(3)).
+- **Arbitrary Rejections**: Citizens lack accessible legal tools to analyze denial orders and challenge non-disclosure.
 
-- Identify the **correct government department** to address
-- Draft a **legally correct application** under RTI Act 2005
-- Understand what information is **legally accessible** vs. exempt
-- Know **how and where to file** their application
-- Track **deadlines** for First Appeal (30 days) and Second Appeal (90 days)
-
-RTIAssist solves all these problems in one tool — **free**, in **your language**, in **seconds**.
+RTIAssist automates this entire lifecycle in 11 Indian languages, from problem definition to final statutory appeal.
 
 ---
 
-## ✨ Features
+## System Architecture
 
-| Feature | Description |
-|---------|-------------|
-| 🤖 **4-Layer AI Pipeline** | Intent → PIO Resolver → Draft → Quality Check |
-| 🌐 **11 Indian Languages** | Hindi, English, Tamil, Telugu, Kannada, Bengali, Gujarati, Marathi, Punjabi, Malayalam, Odia |
-| 📱 **Telegram Bot** | Full RTI + Legal tools via Telegram, webhook mode |
-| ⚖️ **Legal Tools** | Consumer Court, Legal Notice, Labour Complaint, Second Appeal |
-| 💡 **Legal Examples Library** | 44 real-world examples with prefilled forms |
-| 🎯 **Quality Score** | 0–100 score + exemption risk analysis |
-| 🔔 **Deadline Alerts** | Bell icon with in-app alerts + browser push notifications |
-| 🤖 **Telegram Reminders** | Bot sends deadline reminders 7 days & 1 day before deadline |
-| 📋 **RTI Tracker** | Save, track, and manage all your filed RTIs locally |
-| 🔗 **WhatsApp Share** | Share RTI draft directly via WhatsApp |
-| 📄 **PDF Download** | Download RTI draft as PDF |
-| ⭐ **User Feedback** | 5-star rating + comment form (Formspree) in Settings |
-| ❓ **Help & Support** | FAQ accordion + contact options in Settings |
-| 🔒 **Privacy Policy** | Full privacy policy modal in Settings |
-| 🐳 **Docker Ready** | One-command deployment on any platform |
+The following diagram illustrates the multi-tier system architecture:
+
+```mermaid
+graph TB
+    subgraph ClientTier["Client Tier"]
+        WebUI["React 19 Web Workspace<br/>(Vite, Tailwind CSS)"]
+        TgClient["Telegram Messenger<br/>(Mobile / Desktop Client)"]
+    end
+
+    subgraph IngressTier["Ingress & Gateway Tier"]
+        FastAPIApp["FastAPI Application Core"]
+        AuthModule["JWT Auth & Security Guard<br/>(Native Bcrypt)"]
+        TgWebhook["Telegram Webhook Receiver"]
+    end
+
+    subgraph ServiceTier["Core Application Services"]
+        AIEngine["4-Layer AI Pipeline Engine"]
+        CaseEngine["Case Lifecycle Engine"]
+        AuthService["Authority Resolution Service"]
+        DeadlineEngine["Statutory Deadline Calculator"]
+        OCREngine["OCR & Document Parser"]
+        SourceMonitor["Source Intelligence & Monitor"]
+    end
+
+    subgraph IntegrationTier["Inference & External Services"]
+        ASI1["Fetch.ai ASI-1 API<br/>(asi1-mini Reasoning Model)"]
+        TgBotAPI["Telegram Bot API"]
+        GovPortals["Official Government Portals"]
+    end
+
+    subgraph PersistenceTier["Persistence Tier"]
+        SQLAlchemyORM["SQLAlchemy ORM & Repositories"]
+        Database[(SQLite Database<br/>rtiassist.db)]
+    end
+
+    WebUI -->|HTTP / JSON| FastAPIApp
+    TgClient -->|Webhook Updates| TgWebhook
+    TgWebhook --> FastAPIApp
+    FastAPIApp --> AuthModule
+    AuthModule --> ServiceTier
+    
+    AIEngine -->|Prompts & Inference| ASI1
+    DeadlineEngine -->|Push Notifications| TgBotAPI
+    SourceMonitor -->|Health & Schema Check| GovPortals
+    
+    ServiceTier --> SQLAlchemyORM
+    SQLAlchemyORM --> Database
+```
 
 ---
 
-## 🖼️ Screenshots
+## Live End-to-End Workflow
 
-| RTI Generator | Legal Tools | Telegram Bot |
-|:---:|:---:|:---:|
-| *(coming soon)* | *(coming soon)* | *(coming soon)* |
+The sequence below illustrates the live lifecycle of a citizen query from submission through draft generation, filing, and statutory appeal escalation:
 
-> Screenshots will be added after public launch. Live demo: [shlok926.github.io/rtiassist-api](https://shlok926.github.io/rtiassist-api)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Citizen as Citizen / User
+    participant Client as Web App / Telegram Bot
+    participant API as FastAPI Backend
+    participant Pipeline as 4-Layer AI Pipeline
+    participant DB as SQLite Repositories
+    participant Scheduler as Deadline & Reminder Engine
+
+    Citizen->>Client: Submits grievance in plain language (1 of 11 languages)
+    Client->>API: POST /rti/generate (description, state, language)
+    
+    rect rgb(240, 248, 255)
+        Note over API,Pipeline: 4-Layer AI Pipeline Execution
+        API->>Pipeline: Layer 1: Classify Intent & Extract Case Facts
+        Pipeline-->>API: Facts JSON & Recommended Action
+        API->>DB: Layer 2: Resolve Public Authority & Competent PIO
+        DB-->>API: Authority Metadata, Filing Fee, Portal URL
+        API->>Pipeline: Layer 3: Generate Structured RTI Draft
+        Pipeline-->>API: Section-Compliant RTI Draft
+        API->>Pipeline: Layer 4: Audit Draft Quality & Sec 8 Risk
+        Pipeline-->>API: Quality Score (0-100) & Risk Summary
+    end
+
+    API->>DB: Store Case (Status: DRAFTED)
+    API-->>Client: Return Structured JSON (Draft, PIO, Fee, Score)
+    Client-->>Citizen: Displays Preview, PDF Download, WhatsApp Share
+
+    Note over Citizen,Client: Citizen files application with Public Authority
+    Citizen->>Client: Confirms filing & inputs post receipt / acknowledgement
+    Client->>API: POST /cases/{id}/status (FILED, tracking_no)
+    API->>Scheduler: Compute Statutory 30-Day Response Window
+    Scheduler->>DB: Register First Appeal Deadline Record
+
+    opt Authority Rejects or Fails to Respond (After 30 Days)
+        Scheduler-->>Client: Trigger Proactive Deadline Alert
+        Citizen->>Client: Uploads Rejection Letter / Notice (PDF/Image)
+        Client->>API: POST /pdf/analyze & /cases/{id}/appeal
+        API->>Pipeline: Parse Rejection Order & Frame Grounds of Appeal
+        Pipeline-->>API: Formatted First Appeal Petition (Section 19(1))
+        API->>Scheduler: Compute 90-Day Second Appeal Window
+        API-->>Client: Returns Formatted Appeal Document
+    end
+```
 
 ---
 
-## 🛠️ Tech Stack
+## Database Architecture
 
-| Layer | Technology |
-|-------|-----------|
-| AI Engine | ASI-1 API (`asi1-mini` model) |
-| Backend | FastAPI + Python 3.10 |
-| Bot | Python Telegram Bot v20 |
-| Data Validation | Pydantic v2 |
-| Frontend | Vanilla HTML / CSS / JS |
-| Deployment | Docker + Hugging Face Spaces |
-| API Docs | Swagger UI (auto at `/docs`) |
+The entity-relationship model enforces strict user case isolation, lifecycle tracking, public authority registries, and statutory deadlines:
+
+```mermaid
+erDiagram
+    USERS ||--o{ CASES : owns
+    CASES ||--o{ DOCUMENTS : contains
+    CASES ||--o{ FILINGS : tracks
+    CASES ||--o{ DEADLINES : schedules
+    CASES ||--o{ APPEALS : escalates
+    CASES ||--o{ CASE_EVENTS : audits
+    CASES ||--o{ RESPONSE_ANALYSIS : analyzes
+    AUTHORITIES ||--o{ CASES : assigned_to
+    AUTHORITIES ||--o{ OFFICIAL_SOURCES : verified_by
+
+    USERS {
+        string id PK
+        string email UK
+        string password_hash
+        string telegram_id UK
+        string first_name
+        string last_name
+        string role
+        boolean is_active
+        datetime created_at
+    }
+
+    CASES {
+        string id PK
+        string user_id FK
+        string authority_id FK
+        string title
+        string problem_description
+        string status
+        string priority
+        string recommended_action
+        string case_objective
+        string extracted_facts
+        datetime created_at
+        datetime updated_at
+    }
+
+    AUTHORITIES {
+        string id PK
+        string name
+        string jurisdiction
+        string state
+        string pio_name
+        string pio_address
+        string filing_fee
+        string portal_url
+        string active_status
+    }
+
+    DOCUMENTS {
+        string id PK
+        string case_id FK
+        string doc_type
+        string content
+        string language
+        integer quality_score
+        datetime created_at
+    }
+
+    FILINGS {
+        string id PK
+        string case_id FK
+        string filing_mode
+        string tracking_number
+        datetime filed_at
+    }
+
+    DEADLINES {
+        string id PK
+        string case_id FK
+        string deadline_type
+        datetime due_date
+        string status
+        boolean reminder_sent
+    }
+
+    APPEALS {
+        string id PK
+        string case_id FK
+        string appeal_type
+        string appellate_authority
+        string appeal_grounds
+        string status
+        datetime created_at
+    }
+
+    RESPONSE_ANALYSIS {
+        string id PK
+        string case_id FK
+        string parsed_text
+        string rejection_grounds
+        string appeal_viable
+    }
+
+    CASE_EVENTS {
+        string id PK
+        string case_id FK
+        string event_type
+        string description
+        datetime created_at
+    }
+
+    OFFICIAL_SOURCES {
+        string id PK
+        string authority_id FK
+        string source_url
+        string verification_status
+        datetime last_scraped_at
+    }
+```
 
 ---
 
-## ⚡ Quick Start
+## Core Capabilities
 
-### 1. Clone & Setup
+- **4-Layer AI Pipeline**:
+  - *Layer 1 (Intent)*: Determines whether RTI, Consumer Forum, Labour Court, or Grievance Portal is the appropriate legal mechanism.
+  - *Layer 2 (PIO Resolver)*: Matches query context against 700+ Central and State authority departments.
+  - *Layer 3 (Drafter)*: Assembles questions adhering to Section 6(1) drafting principles without requesting opinions.
+  - *Layer 4 (Quality Scorer)*: Evaluates risk against Section 8 exemption clauses (defense, trade secrets, personal privacy) and assigns a score from 0 to 100.
+- **Language Support**: Native drafting across 11 languages: English, Hindi, Tamil, Telugu, Kannada, Bengali, Gujarati, Marathi, Punjabi, Malayalam, and Odia.
+- **End-to-End Case Progression**: Full tracking across states: `UNDERSTANDING` -> `DRAFTED` -> `FILED` -> `PENDING_RESPONSE` -> `FIRST_APPEAL` -> `SECOND_APPEAL`.
+- **OCR and Rejection Parsing**: Upload rejection notices to isolate specific rejection clauses cited by authorities and auto-populate appeal templates.
+- **Proactive Deadline Alerts**: Real-time statutory deadline monitoring with push alerts at 7 days and 1 day prior to expiry.
+- **Enterprise Security**: Native `bcrypt` password hashing, token-based JWT authentication, rate limiting, and case data isolation.
+
+---
+
+## Tech Stack
+
+| Layer | Component | Description |
+|---|---|---|
+| **Frontend** | React 19, Vite 8, Tailwind CSS | Client workspace with responsive forms and document export |
+| **Backend** | FastAPI, Python 3.10+, Uvicorn | High-concurrency async REST API and webhook endpoints |
+| **AI Inference** | Fetch.ai ASI-1 API (`asi1-mini`) | High-speed LLM reasoning pipeline |
+| **Data & ORM** | SQLAlchemy, SQLite, Alembic | Relational storage with repository abstraction |
+| **Security** | Native Bcrypt, PyJWT | Cryptographic password verification and bearer authentication |
+| **OCR & Parsing**| `pdfplumber`, PyPDFium2 | PDF ingestion, text extraction, and clause parsing |
+| **Bot Gateway** | `python-telegram-bot` v20 | Webhook-driven interactive Telegram assistant |
+| **Testing** | Pytest, Vitest | 117 backend integration tests and frontend component checks |
+
+---
+
+## Quick Start
+
+### Prerequisites
+- Python 3.10 or higher
+- Node.js 18 or higher with npm
+- Git
+
+### 1. Clone and Set Up Backend
 ```bash
 git clone https://github.com/shlok926/rtiassist-api.git
 cd rtiassist-api
+
+# Create and activate Python virtual environment
 python -m venv venv
-source venv/bin/activate      # Windows: venv\Scripts\activate
+venv\Scripts\activate       # On Linux/macOS: source venv/bin/activate
+
+# Install backend dependencies
 pip install -r requirements.txt
 ```
 
-### 2. Configure Environment
+### 2. Set Up Frontend
+```bash
+npm install
+```
+
+### 3. Environment Variables
+Copy `.env.example` to `.env`:
 ```bash
 cp .env.example .env
-# Edit .env and fill in:
-# ASI1_API_KEY — from https://asi1.ai
-# TELEGRAM_TOKEN — from @BotFather on Telegram
 ```
 
-### 3. Run
+Configure the environment variables in `.env`:
+```env
+ASI1_API_KEY=your_asi1_api_key_here         # Fetch.ai API key from https://asi1.ai
+TELEGRAM_TOKEN=your_telegram_bot_token       # Telegram token from @BotFather (optional)
+JWT_SECRET=your_secure_random_key_here
+DATABASE_URL=sqlite:///./rtiassist.db
+```
+
+### 4. Run Development Servers
+
+**Run FastAPI Backend:**
+```bash
+uvicorn main:app --reload --port 8000
+```
+API documentation is available at `http://localhost:8000/docs`.
+
+**Run React Frontend:**
+```bash
+npm run dev
+```
+Client workspace is available at `http://localhost:5173`.
+
+---
+
+## Testing
+
+Run test suites across backend and frontend:
 
 ```bash
-# API Server + Bot (port 7860) — bot runs in webhook mode inside the API
-python app.py
+# Execute backend test suite (117 test cases)
+pytest
 
-# Website — just open the HTML file directly in any browser
-# index_Version4.html — no server needed, fully self-contained
+# Execute frontend component test suite
+npm run test
+
+# Run frontend production build check
+npm run build
 ```
 
 ---
 
-## 📖 Usage
-
-### Generate an RTI via Website
-1. Open `http://localhost:8080/index_Version4.html`
-2. Click **RTI Generator**
-3. Describe your problem in plain language (any Indian language)
-4. Select language + state
-5. Click **Generate** — download PDF or copy your RTI draft
-
-### Use Legal Tools
-1. Click **Legal Tools** in the navbar
-2. Choose: Consumer Complaint / Legal Notice / Labour Complaint / Second Appeal
-3. Fill in the form (or pick from **Legal Examples Library** — 44 real-world cases)
-4. Generate your legal draft instantly
-
-### RTI Tracker
-1. After generating your RTI, click **Save to Tracker**
-2. Track status: Filed → Response Due → Received / First Appeal / Second Appeal
-3. Set a Telegram Reminder for automatic deadline reminders
-
-### Telegram Bot
-Send `/start` to [@RTIAssistBot](https://t.me/RTIAssistBot) → choose language → pick tool → describe your problem → get your draft.
-
----
-
-## 📡 API Reference
-
-Interactive docs available at **`/docs`** (Swagger UI) when server is running.
-
-### `POST /rti/generate`
-
-**Request:**
-```json
-{
-  "description": "My ration card was rejected 3 months ago. I want to know the exact reason.",
-  "language": "hindi",
-  "state": "Maharashtra"
-}
-```
-
-**Response:**
-```json
-{
-  "draft": "दिनांक: [दिनांक]\n\nसेवा में,\nलोक सूचना अधिकारी...",
-  "department": "Food and Civil Supplies Department",
-  "quality_score": 88,
-  "estimated_success_probability": "high",
-  "pio_details": {
-    "filing_fee": "Rs. 10",
-    "online_portal": "https://rtionline.gov.in"
-  },
-  "filing_instructions": "Step-by-step guide..."
-}
-```
-
-### Legal Tool Endpoints
-
-| Endpoint | Description |
-|----------|-------------|
-| `POST /legal/consumer-complaint` | Consumer Court complaint draft |
-| `POST /legal/legal-notice` | Legal notice draft |
-| `POST /legal/labour-complaint` | Labour department complaint |
-| `POST /legal/second-appeal` | Second appeal to CIC/SIC |
-
----
-
-## 🤖 Telegram Bot
-
-**Bot Flow:**
-```
-/start → Choose Language → Tool Menu
-                              ├── 📋 RTI Application
-                              ├── ⚖️  Consumer Complaint
-                              ├── 📜 Legal Notice
-                              ├── 👷 Labour Complaint
-                              └── 📁 Second Appeal
-```
-
-**Bot Commands:**
-```
-/start        — Start the bot and choose language
-/help         — How to use RTIAssist
-/about        — About this tool
-/fee          — RTI filing fees for all states
-/state        — Select your state
-/legal        — Legal tools (Consumer, Appeal, etc.)
-/myreminders  — View your active RTI deadline reminders
-```
-
-**Telegram Reminders:** After saving an RTI to the tracker on the website, click **"Set Reminder →"** — bot will automatically remind you 7 days and 1 day before the response deadline.
-
----
-
-## 🧠 Architecture — 4-Layer AI Pipeline
-
-```
-Citizen plain-language input
-         │
-         ▼
-┌─────────────────────┐
-│  Layer 1: Action    │  ← ASI-1 #1 — Recommends action (RTI, Grievance, etc.), extracts facts
-│  Recommender        │
-└──────────┬──────────┘
-           ▼
-┌─────────────────────┐
-│  Layer 2: PIO       │  ← ASI-1 #2 — Finds correct PIO, address, fee, portal
-│  Resolver           │
-└──────────┬──────────┘
-           ▼
-┌─────────────────────┐
-│  Layer 3: Draft     │  ← ASI-1 #3 — Generates legally correct RTI application
-│  Generator          │
-└──────────┬──────────┘
-           ▼
-┌─────────────────────┐
-│  Layer 4: Quality   │  ← ASI-1 #4 — Quality score, exemption risk, suggestions
-│  Checker            │
-└──────────┬──────────┘
-           ▼
-  Structured JSON Response
-  ├── Complete RTI draft
-  ├── Filing instructions
-  ├── PIO details + portal
-  ├── Quality score (0–100)
-  └── Success probability
-```
-
----
-
-## 📁 Project Structure
+## Project Structure
 
 ```
 rtiassist-api/
-├── app.py                  # Entry point — starts API + bot
-├── main.py                 # FastAPI app definition
-├── start.sh                # Docker startup script
-├── Dockerfile
-├── requirements.txt
-├── .env.example
+├── main.py                     # FastAPI application factory and router configuration
+├── app.py                      # Alternative entry point for Hugging Face Spaces
+├── start.sh                    # Container boot script
+├── Dockerfile                  # Container definition
+├── render.yaml                 # Render cloud deployment blueprint
+├── requirements.txt            # Python dependencies
+├── package.json                # Frontend dependencies and scripts
 │
-├── routes/
-│   ├── rti.py              # POST /rti/generate
-│   └── legal.py            # 4 legal tool endpoints
+├── agents/                     # 4-Layer AI Pipeline
+│   ├── intent_classifier.py    # Problem classification and legal mechanism routing
+│   ├── pio_resolver.py         # Authority identification and directory resolution
+│   ├── draft_generator.py      # Statutory RTI application draft generation
+│   └── quality_checker.py      # Section 8 exemption risk analysis and quality score
 │
-├── agents/
-│   ├── intent_classifier.py
-│   ├── pio_resolver.py
-│   ├── draft_generator.py
-│   └── quality_checker.py
+├── routes/                     # REST API route handlers
+│   ├── auth.py                 # User authentication (register, login, JWT)
+│   ├── cases.py                # Case tracking, status changes, appeal triggers
+│   ├── authorities.py          # Authority search and directory lookup
+│   ├── admin_authorities.py    # Public authority management endpoints
+│   ├── rti.py                  # Direct RTI generation endpoint
+│   ├── legal.py                # Legal tools (Consumer, Labour, Legal Notice, Second Appeal)
+│   └── pdf_analysis.py         # OCR upload and rejection letter parser
 │
-├── prompts/
-│   └── system_prompts.py   # All ASI-1 system prompts
+├── services/                   # Core business logic layer
+│   ├── case_service.py         # Case state management and validation
+│   ├── appeal_service.py       # First and Second Appeal petition generation
+│   ├── authority_service.py    # Jurisdiction and fee calculation
+│   ├── source_monitoring.py    # Scheduled authority status scraping
+│   ├── ocr_service.py          # PDF extraction and rejection parsing
+│   └── deadline_service.py     # 30-day and 90-day statutory timeline calculation
 │
-├── models/
-│   └── schemas.py          # Pydantic request/response models
+├── repositories/               # Data access layer
+│   ├── user_repository.py      # User authentication queries
+│   ├── case_repository.py      # Case storage and event logging
+│   └── authority_repository.py # Authority data access
 │
-├── utils/
-│   └── asi1_client.py      # ASI-1 API wrapper
+├── integrations/
+│   └── telegram/               # Telegram bot implementation (Webhook mode)
+│       ├── bot.py              # Application builder and handler wiring
+│       ├── handlers.py         # Interactive commands (/start, /newcase, /cases)
+│       └── identity.py         # Telegram ID to RTIAssist user mapping
 │
-├── telegram_bot.py         # Telegram bot logic
-├── bot_languages.py        # Bot UI translations
+├── src/                        # React 19 Frontend
+│   ├── App.jsx                 # Citizen workspace shell
+│   ├── components/             # Reusable UI modules (RTI, Legal, Tracker, Auth)
+│   └── context/                # Client state management
 │
-├── index_Version4.html     # Full web frontend
-├── legal_examples.js       # 44 real-world legal examples
-├── ui_translations.js      # Website UI translations
-└── tracker_Version2.js     # RTI tracker JS
+├── docs/                       # Project documentation
+│   ├── RTI_PRODUCT_OVERVIEW.md # Comprehensive RTI legal guide
+│   ├── DESIGN_AND_TECH_STACK.md# System architecture deep-dive
+│   └── DEPLOYMENT.md           # Cloud deployment instructions
+│
+└── tests/                      # Automated test suite (117 test cases)
+    ├── test_auth.py            # Password hashing and token validation
+    ├── test_cases.py           # Case state and appeal transitions
+    ├── test_authorities.py     # Authority lookup tests
+    ├── test_web_telegram_parity.py # Web-to-Telegram feature parity
+    └── frontend/               # Vitest component test cases
 ```
 
 ---
 
-## 🤝 Contributing
+## API Reference
 
-Contributions are welcome! Here's how:
+Interactive Swagger documentation is available at `/docs` when the backend is running.
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/your-feature`
-3. Commit your changes: `git commit -m "feat: add your feature"`
-4. Push to the branch: `git push origin feature/your-feature`
-5. Open a Pull Request
+### Core Endpoints
 
-**Ideas for contributions:**
-- Add more Indian languages (Assamese, Konkani, Manipuri, Sindhi)
-- Improve AI draft quality with more RTI Act case law
-- Add more real-world RTI examples to the Examples Library
-- UI improvements and mobile responsiveness
-- Persistent reminder backend with database
-
----
-
-## 🔮 Future Scope
-
-| Priority | Feature | Status |
-|----------|---------|--------|
-| 🔴 High | **Supabase Persistent Storage** — Reminders + user preferences saved permanently across bot restarts | Planned |
-| 🔴 High | **Screenshots in README** — Live screenshots of RTI Generator, Legal Tools, Telegram Bot | Planned |
-| 🟡 Medium | RTI Status Tracker via registered post number (auto-fetch from India Post) | Planned |
-| 🟡 Medium | Verified PIO directory for 700+ Central Government departments | Planned |
-| 🟡 Medium | OCR — scan rejection letters and auto-draft appeals | Planned |
-| 🟡 Medium | WhatsApp Bot integration | Planned |
-| 🟢 Low | Android/iOS mobile app | Future |
-| 🟢 Low | **Gram Panchayat Complaint** — MNREGA funds misused? Road/nali not built? File formal complaint to District Collector | Future |
-| 🟢 Low | **Tender Objection (CVC)** — Government tender irregularity? File CVC complaint + RTI for tender documents combo | Future |
+| Category | Method | Endpoint | Description |
+|---|---|---|---|
+| **Authentication** | `POST` | `/auth/register` | Register user with bcrypt password hash |
+| **Authentication** | `POST` | `/auth/token` | Authenticate and obtain JWT bearer token |
+| **RTI Generator** | `POST` | `/rti/generate` | Generate RTI draft and PIO metadata via AI pipeline |
+| **Case Lifecycle** | `POST` | `/cases/` | Create and store a new case record |
+| **Case Lifecycle** | `GET` | `/cases/` | Fetch all cases belonging to authenticated user |
+| **Case Lifecycle** | `POST` | `/cases/{id}/appeal` | Generate First or Second Appeal from existing case |
+| **Authorities** | `GET` | `/authorities/search` | Search 700+ Public Authorities across India |
+| **OCR Analysis** | `POST` | `/pdf/analyze` | Ingest rejection notice and extract grounds of appeal |
+| **Legal Tools** | `POST` | `/legal/consumer-complaint` | Generate Consumer Protection Court petition |
+| **Legal Tools** | `POST` | `/legal/legal-notice` | Generate formal demand notice |
+| **Legal Tools** | `POST` | `/legal/labour-complaint` | Generate Labour Commission complaint |
 
 ---
 
-## 👨‍💻 Author
+## Telegram Bot Integration
 
-**Shlok** — [@shlok926](https://github.com/shlok926)
+The Telegram Bot operates in webhook mode alongside the FastAPI server:
 
-Built with ❤️ to empower Indian citizens with their Right to Information.
-Powered by **ASI-1 API** by [Fetch.ai](https://fetch.ai)
-
----
-
-## ⚠️ Disclaimer
-
-RTIAssist is an informational and productivity tool designed to help Indian citizens draft RTI applications and legal documents. It does **not** constitute legal advice. Key points:
-
-- Always **verify the PIO name and address** before filing — officers change frequently
-- Generated drafts should be **reviewed before submission**
-- RTIAssist is **not liable** for outcomes of filed applications
-- For complex legal matters, consult a qualified RTI activist or advocate
-- **BPL cardholders are exempt from filing fees** — carry BPL card copy when filing in person
+- **Command Menu**:
+  - `/start`: Select language and initiate case creation.
+  - `/newcase`: Begin plain-language complaint ingestion.
+  - `/cases`: View active cases and statutory countdowns.
+  - `/help`: Detailed instructions for filing and statutory requirements.
+- **Automated Deadline Notifications**: Direct messages sent 7 days and 1 day prior to First Appeal deadline expiry.
 
 ---
 
-## 📄 License
+## Development Milestones
 
-MIT License — see [LICENSE](LICENSE) for details.
+- **Phases 1 to 11**: 4-Layer AI Pipeline, prompt engineering, 11 Indian languages, and bot integration.
+- **Phase 12**: Security architecture audit and production readiness hardening.
+- **Phase 13**: Real-world case intelligence, fact extraction, and response mapping.
+- **Phase 14**: React 19 citizen workspace and central UI integration.
+- **Phase 15**: Scheduled source monitoring, authority seeding, and product hardening.
+- **Phase 16**: Final production audit, native `bcrypt` migration, and web-telegram parity validation.
+
+Historical release notes and phase milestones are documented in [`CHANGELOG.md`](CHANGELOG.md).
 
 ---
 
-<div align="center">
+## Contributing
 
-**RTIAssist — Bringing India's Right to Information to every citizen's fingertips.**
+Contributions are welcome. Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for local setup instructions, code standards, and pull request guidelines.
 
-*Jan Shakti. Jan Jagruti. Jan Suchna.*
-*(People's Power. People's Awareness. People's Information.)*
+---
 
-Powered by **[ASI-1 API](https://asi1.ai)** &nbsp;|&nbsp; Built with ❤️ by **[Shlok](https://github.com/shlok926)**
+## License
 
-</div>
+This project is licensed under the MIT License. See [LICENSE.md](LICENSE.md) for full terms.
